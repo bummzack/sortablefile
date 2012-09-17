@@ -9,6 +9,8 @@ class SortableUploadField extends UploadField
 {
 	public function Field($properties = array()) {
 		Requirements::javascript('sortablefile/javascript/SortableUploadField.js');
+		Requirements::css('sortablefile/css/SortableUploadField.css');
+
 		return parent::Field($properties);
 	}
 	
