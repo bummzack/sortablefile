@@ -20,7 +20,6 @@ class Sortable extends DataExtension
 	/**
 	 * @see DataExtension::augmentSQL()
 	 */
-	// this seems to be ignored with relationship getters... so this makes this class kinda useless..
 	public function augmentSQL(SQLQuery &$query)
 	{
 		$select = $query->getSelect();

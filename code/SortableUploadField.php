@@ -82,6 +82,7 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 			$itm->write();
 			$sort++;
 		}
+		Requirements::clear();
 		return "1";
 	}
 	
