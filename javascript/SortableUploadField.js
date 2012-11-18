@@ -26,7 +26,7 @@
 							return;
 						}
 						
-						$.get(url, { newPosition: (ui.item.index() + 1) }, function(data, status){
+						$.get(url, { newPosition: (ui.item.index()) }, function(data, status){
 							
 						});
 					}
