@@ -1,18 +1,16 @@
 <?php
 /**
- * Sortable data-extension
- * Currently this only adds the required "Sorting" column to the DB. 
- * Automatic sorting by this column would be nice, but "augmentSQL" doesn't seem
- * to get called in the current version of SilverStripe.
- * 
- * Fix: Add `static $default_sort = "Sorting ASC";` to the exended class :(
+ * Sortable data-extension.
+ * Makes an object sortable. To make an object sortable, add
+ * `Object::add_extension('MyObject', 'Sortable');` in `mysite/_config.php` 
  * 
  * @author bummzack
  */
 class Sortable extends DataExtension
 {
+	// add the sort order to the main Object
 	public static $db = array(
-		'Sorting' => 'Int'
+		'SortOrder' => 'Int'
 	);
 	
 	public static $sort_dir = 'ASC';
@@ -30,7 +28,7 @@ class Sortable extends DataExtension
 			in_array("count(*)",$select)
 		){ return; }
 		
-		$query->setOrderBy("\"Sorting\" " . self::$sort_dir);
+		$query->setOrderBy("\"SortOrder\" " . self::$sort_dir);
 	}
 	
 	/**
@@ -39,12 +37,11 @@ class Sortable extends DataExtension
 	 */
 	public function onBeforeWrite()
 	{
-		if(!$this->owner->ID || !$this->owner->Sorting) {
+		if(!$this->owner->ID || !$this->owner->SortOrder) {
 			$classes = ClassInfo::dataClassesFor($this->owner->ClassName);
 		    $sql = new SQLQuery('count(ID)', array_shift($classes));
 		    $val = $sql->execute()->value();
-		    $this->owner->Sorting = is_numeric($val) ? $val+1 : 1;
-		    
+		    $this->owner->SortOrder = is_numeric($val) ? $val+1 : 1;
 		}
-	}	
+	}
 }

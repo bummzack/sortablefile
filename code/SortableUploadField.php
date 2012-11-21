@@ -5,16 +5,19 @@
  *
  * @author bummzack
  */
-class SortableUploadField extends UploadField {
+class SortableUploadField extends UploadField 
+{
 	/**
 	 * @var string the column to be used for sorting
 	 */
 	protected $sortColumn = 'SortOrder';
+	
 	public function Field($properties = array()) {
 		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
 		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
 		return parent::Field($properties);
 	}
+	
 	/**
 	 * @param int $itemID
 	 * @return UploadField_ItemHandler
@@ -22,6 +25,7 @@ class SortableUploadField extends UploadField {
 	public function getItemHandler($itemID) {
 		return SortableUploadField_ItemHandler::create($this, $itemID);
 	}
+	
 	/**
 	 * Set the column to be used for sorting
 	 * @param string $sortColumn
@@ -29,6 +33,7 @@ class SortableUploadField extends UploadField {
 	public function setSortColumn($sortColumn) {
 		$this->sortColumn = $sortColumn;
 	}
+	
 	/**
 	 * Returns the column to be used for sorting
 	 * @return string
@@ -36,36 +41,50 @@ class SortableUploadField extends UploadField {
 	public function getSortColumn() {
 		return $this->sortColumn;
 	}
+	
 	public function getItems() {
 		$items = parent::getItems();
 		return $items->sort($this->getSortColumn(), 'ASC');
 	}
 }
 
-class SortableUploadField_ItemHandler extends UploadField_ItemHandler {
+class SortableUploadField_ItemHandler extends UploadField_ItemHandler 
+{
 	/**
 	 * Action to handle sorting of a single file
 	 *
 	 * @param SS_HTTPRequest $request
 	 */
 	public function sort(SS_HTTPRequest $request) {
+		
 		// Check if a new position is given
 		$newPosition = $request->getVar('newPosition');
-		if ($newPosition === "")
+		
+		if ($newPosition === ""){
 			return $this->httpError(403);
+		}
+		
 		// Check form field state
-		if ($this->parent->isDisabled() || $this->parent->isReadonly())
+		if ($this->parent->isDisabled() || $this->parent->isReadonly()){
 			return $this->httpError(403);
+		}
+		
 		// Check item permissions
 		$itemMoved = $this->getItem();
-		if (!$itemMoved)
+		if (!$itemMoved){
 			return $this->httpError(404);
-		if (!$itemMoved->canEdit())
+		}
+		
+		if (!$itemMoved->canEdit()){
 			return $this->httpError(403);
+		}
+		
 		// Only allow actions on files in the managed relation (if one exists)
 		$sortColumn = $this->parent->getSortColumn();
-		if ($this->parent->managesRelation() && !$this->parent->getItems()->byID($itemMoved->ID))
+		if ($this->parent->managesRelation() && !$this->parent->getItems()->byID($itemMoved->ID)){
 			return $this->httpError(403);
+		}
+		
 		$relationName = $this->parent->getName();
 		$record = $this->parent->getRecord();
 		if ($record && $record->exists() && $record->hasMethod($relationName)) {
@@ -78,6 +97,7 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler {
 				$itemMoved = $list->byID($itemMoved->ID);
 				list($parentClass, $componentClass, $parentField, $componentField, $table) = $record->many_many($relationName);
 			}
+			
 			$i = 0;
 			$newPosition = intval($newPosition);
 			$oldPosition = intval($itemMoved->$sortColumn);
@@ -109,11 +129,13 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler {
 				}
 				$i++;
 			}
+			
 			Requirements::clear();
 			return "1";
 		}
 		return $this->httpError(403);
 	}
+	
 	/**
 	 * @return string
 	 */

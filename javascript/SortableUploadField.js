@@ -27,7 +27,7 @@
 						}
 						
 						$.get(url, { newPosition: (ui.item.index()) }, function(data, status){
-							
+							//window.console.log(data);
 						});
 					}
 				});
