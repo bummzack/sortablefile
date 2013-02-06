@@ -1,13 +1,12 @@
 {
-    "name": "silverstripe/doscms3",
+    "name": "silverstripe/sortablefile",
     "description": "An extension for SilverStripe 3.0 that allows sorting of multiple attached images (extends UploadField).",
     "type": "silverstripe-module",
     "keywords": ["silverstripe", "CMS", "sortable"],
     "license": "BSD-3-Clause",
     "authors": [
     {
-        "name": "Dospuntocero",
-        "email": "fa@dospuntocero.cl"
+        "name": "bummzack"
     }
     ],
     "require":
