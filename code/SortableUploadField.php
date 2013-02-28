@@ -27,6 +27,46 @@ class SortableUploadField extends UploadField
 	}
 	
 	/**
+	 * Each file that's being attached must have it's sort order set to the max value
+	 * of the current relation.
+	 * This only applies when we're dealing with many_many relations
+	 * @see UploadField::attachFile()
+	 */
+	protected function attachFile($file) {
+		parent::attachFile($file);
+		$record = $this->getRecord();
+		$name = $this->getName();
+		if ($record && $record->exists() && $record->many_many($name)) {
+			$sortField = $this->getSortColumn();
+			list($parentClass, $componentClass, $parentField, $componentField, $table) = $record->many_many($name);
+			
+			$q = sprintf(
+				'SELECT (MAX("%s") + 1) AS \'MaxSortValue\' FROM "%s" WHERE "%s" = %d',
+				$sortField,
+				$table,
+				$parentField,
+				$record->ID
+			);
+			$result = DB::query($q);
+			
+			if($result && $row = $result->first()){
+				$sort = $row['MaxSortValue'];
+				$q = sprintf(
+					'UPDATE "%s" SET "%s" = %d WHERE "%s" = %d AND "%s" = %d',
+					$table,
+					$sortField,
+					$sort,
+					$componentField,
+					$file->ID,
+					$parentField,
+					$record->ID
+				);
+				DB::query($q);
+			}
+		}
+	}
+	
+	/**
 	 * Set the column to be used for sorting
 	 * @param string $sortColumn
 	 */

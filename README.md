@@ -33,10 +33,6 @@ First create an extension that will allow adding Images to several pages. We nam
         public static $belongs_many_many = array(
             'Pages' => 'Page'   
         );
-        
-        // The default sorting of the image. This is needed so that your images appear in the correct
-        // order in the frontend
-        public static $default_sort = 'SortOrder ASC';
     }
 
 
@@ -70,6 +66,28 @@ The `PortfolioPage` looks like this:
             $fields->addFieldToTab('Root.Images', $imageField);
             return $fields;
         }
+        
+        // Use this in your templates to get the correctly sorted images
+        public function SortedImages(){
+            return $this->Images('', 'SortOrder ASC');
+        }
     }
 
 Once this has been set up like described above, then you should be able to add images in the CMS and sort them by dragging them (use the thumbnail as handle).
+
+Templates
+-------------
+
+Sorting the Files via a relation table isn't easily achievable via a DataExtension. This is why it's currently up to the user to implement a getter that will return the sorted files, something along the lines of:
+
+        // Use this in your templates to get the correctly sorted images
+        public function SortedImages(){
+            return $this->Images('', 'SortOrder ASC');
+        }
+        
+And then in your templates use: 
+
+        <% loop SortedImages %>
+        $SetWidth(500)
+        <% end_loop %>
+    
