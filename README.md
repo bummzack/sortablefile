@@ -3,8 +3,18 @@ sortablefile
 
 An extension for SilverStripe 3.0 that allows sorting of multiple attached images (extends UploadField).
 
-This currently only works for `has_many` relations.
+This is meant to be used with a `many_many` relation. The `many_many` relation should be preferred over the `has_many` relation,
+as it will allow you to add the same image/file to multiple pages and have individual sorting for each page.
 
+Upgrading
+------------
+
+**Warning:** This release is incompatible with the previous release of `sortablefile`. If you use the `Sortable` DataExtension, 
+you'll have to remove references to it from your `_config.php`, since this class has become obsolete. Eg.
+
+    Object::add_extension('MyImageClass', 'Sortable'); // <-- Remove these lines!
+    
+After switching from the `has_many` version of this module to the `many_many` one, you'll have to re-sort existing images as the sort-order won't transfer over.
 
 Installation
 ------------
@@ -14,27 +24,40 @@ Clone/download this repository into a folder called "sortablefile" in your Silve
 Example setup
 -------------
 
-Let's assume we have a `PortfolioPage` that has multiple `PortfolioImages`. The `PortfolioImage` is a subclass of `Image` and looks like this:
+Let's assume we have a `PortfolioPage` that has multiple `Images` attached. 
+First create an extension that will allow adding Images to several pages. We name it `LinkedImage`.
 
-    class PortfolioImage extends Image
+    class LinkedImage extends DataExtension
     {
-        public static $has_one = array(
-            'PortfolioPage' => 'PortfolioPage'
+        // this image belongs to many pages. We use Page here, so that the image can be added to any page
+        public static $belongs_many_many = array(
+            'Pages' => 'Page'   
         );
+        
+        // The default sorting of the image. This is needed so that your images appear in the correct
+        // order in the frontend
+        public static $default_sort = 'SortOrder ASC';
     }
 
 
-We enable sorting for `PortfolioImage` by adding the following line to `mysite/_config.php` (run `dev/build` afterwards!):
+We enable the above extension by adding the following line to `mysite/_config.php` (run `dev/build` afterwards!):
 
-    // Make portfolio images sortable
-    Object::add_extension('PortfolioImage', 'Sortable');
+    // Make images attachable to (multiple) pages
+    Object::add_extension('Image', 'LinkedImage');
 
 The `PortfolioPage` looks like this:
 
     class PortfolioPage extends Page
     {   
-        public static $has_many = array(
-            'Images' => 'PortfolioImage'
+        // This page can have many images
+        public static $many_many = array(
+            'Images' => 'Image'
+        );
+        
+        // this adds the SortOrder field to the relation table. Please note that the key (in this case 'Images') 
+        // has to be the same key as in the $many_many definition!
+        public static $many_many_extraFields = array(
+            'Images' => array('SortOrder' => 'Int')
         );
     
         public function getCMSFields()
