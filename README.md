@@ -14,7 +14,7 @@ Clone/download this repository into a folder called "sortablefile" in your Silve
 Example setup
 -------------
 
-Let's assume we have a `PortfolioPage` that has multiple `Images`. Define the relation in an DataExtension:
+Let's assume we have a `PortfolioPage` that has multiple `Images`. Define the relation in a DataExtension:
 
     class ImageExtension extends DataExtension
     {
@@ -23,7 +23,8 @@ Let's assume we have a `PortfolioPage` that has multiple `Images`. Define the re
         );
     }
 
-We apply the `ImageExtension` to the `Image` class and enable sorting by adding the following lines to `mysite/_config.php` (run `dev/build` afterwards!):
+We apply the `ImageExtension` to the `Image` class   
+and enable sorting by adding the following lines to `mysite/_config.php` (run `dev/build` afterwards!):
 
     //apply the image extension
     Object::add_extension('Image', 'ImageExtension');
