@@ -3,7 +3,7 @@ sortablefile
 
 An extension for SilverStripe 3.0 that allows sorting of multiple attached images (extends UploadField).
 
-This currently only works for `has_many` relations.
+This currently only works for `has_many` relations. For `many_many` relations, have a look at the `many_many` branch.
 
 
 Installation
