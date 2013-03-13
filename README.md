@@ -14,27 +14,30 @@ Clone/download this repository into a folder called "sortablefile" in your Silve
 Example setup
 -------------
 
-Let's assume we have a `PortfolioPage` that has multiple `PortfolioImages`. The `PortfolioImage` is a subclass of `Image` and looks like this:
+Let's assume we have a `PortfolioPage` that has multiple `Images`. Define the relation in a DataExtension:
 
-    class PortfolioImage extends Image
+    class ImageExtension extends DataExtension
     {
         public static $has_one = array(
             'PortfolioPage' => 'PortfolioPage'
         );
     }
 
+We apply the `ImageExtension` to the `Image` class   
+and enable sorting by adding the following lines to `mysite/_config.php` (run `dev/build` afterwards!):
 
-We enable sorting for `PortfolioImage` by adding the following line to `mysite/_config.php` (run `dev/build` afterwards!):
+    //apply the image extension
+    Object::add_extension('Image', 'ImageExtension');
 
     // Make portfolio images sortable
-    Object::add_extension('PortfolioImage', 'Sortable');
+    Object::add_extension('Image', 'Sortable');
 
 The `PortfolioPage` looks like this:
 
     class PortfolioPage extends Page
     {   
         public static $has_many = array(
-            'Images' => 'PortfolioImage'
+            'Images' => 'Image'
         );
     
         public function getCMSFields()
