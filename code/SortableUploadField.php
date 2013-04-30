@@ -13,6 +13,7 @@ class SortableUploadField extends UploadField
 	protected $sortColumn = 'SortOrder';
 	
 	public function Field($properties = array()) {
+		Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery-ui.js');
 		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
 		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
 		return parent::Field($properties);
