@@ -122,7 +122,8 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 		
 		// Only allow actions on files in the managed relation (if one exists)
 		$sortColumn = $this->parent->getSortColumn();
-		if ($this->parent->managesRelation() && !$this->parent->getItems()->byID($itemMoved->ID)){
+		//if ($this->parent->managesRelation() && !$this->parent->getItems()->byID($itemMoved->ID)){
+		if (!$this->parent->getItems()->byID($itemMoved->ID)){
 			return $this->httpError(403);
 		}
 		
