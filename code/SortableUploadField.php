@@ -91,6 +91,10 @@ class SortableUploadField extends UploadField
 
 class SortableUploadField_ItemHandler extends UploadField_ItemHandler 
 {
+	private static $allowed_actions = array(
+		'sort' => true
+	);
+	
 	/**
 	 * Action to handle sorting of a single file
 	 *

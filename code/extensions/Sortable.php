@@ -26,7 +26,20 @@ class Sortable extends DataExtension
 			in_array("count(*)",$select)
 		){ return; }
 		
-		$query->setOrderBy("\"SortOrder\" " . self::$sort_dir);
+		$classes = array_reverse(ClassInfo::dataClassesFor($this->owner->class));
+		$class = null;
+		foreach($classes as $cls){
+			if(DataObject::has_own_table($cls)){
+				$class = $cls;
+				break;
+			}
+		}
+		
+		if($class){
+			$query->setOrderBy("\"$class\".\"SortOrder\" " . self::$sort_dir);
+		} else {
+			$query->setOrderBy("\"SortOrder\" " . self::$sort_dir);
+		}
 	}
 	
 	/**
