@@ -1,6 +1,6 @@
 {
     "name": "bummzack/sortablefile",
-    "description": "An extension for SilverStripe 3.0 that allows sorting of multiple attached images (extends UploadField).",
+    "description": "An extension for SilverStripe 3.1 that allows sorting of multiple attached images (extends UploadField).",
     "type": "silverstripe-module",
     "keywords": ["silverstripe", "CMS", "sortable"],
     "license": "BSD-3-Clause",
@@ -11,7 +11,7 @@
     ],
     "require":
     {
-        "silverstripe/framework": "3.*",
-        "silverstripe/cms": "3.*"
+        "silverstripe/framework": ">=3.1.x-dev,<4.0",
+        "silverstripe/cms": ">=3.1.x-dev,<4.0"
     }
 }

@@ -1,27 +1,16 @@
 sortablefile
 ============
 
-An extension for SilverStripe 3.0 that allows sorting of multiple attached images (extends UploadField).
+An extension for SilverStripe 3.1 that allows sorting of multiple attached images (extends UploadField).
 
-This is meant to be used with a `many_many` relation. The `many_many` relation should be preferred over the `has_many` relation,
-as it will allow you to add the same image/file to multiple pages and have individual sorting for each page.
-
-Upgrading
-------------
-
-**Warning:** This release is incompatible with the previous release of `sortablefile`. If you use the `Sortable` DataExtension, 
-you'll have to remove references to it from your `_config.php`, since this class has become obsolete. Eg.
-
-    Object::add_extension('MyImageClass', 'Sortable'); // <-- Remove these lines!
-    
-After switching from the `has_many` version of this module to the `many_many` one, you'll have to re-sort existing images as the sort-order won't transfer over.
+This is meant to be used with a `many_many` or `has_many` relation. The `many_many` relation should be preferred over the `has_many` relation, as it will allow you to add the same image/file to multiple pages and have individual sorting for each page.
 
 Installation
 ------------
 
 Clone/download this repository into a folder called "sortablefile" in your SilverStripe installation folder. Run `dev/build` afterwards.
 
-Example setup
+Example setup for many_many
 -------------
 
 Let's assume we have a `PortfolioPage` that has multiple `Images` attached. 
@@ -39,7 +28,7 @@ First create an extension that will allow adding Images to several pages. We nam
 We enable the above extension by adding the following line to `mysite/_config.php` (run `dev/build` afterwards!):
 
     // Make images attachable to (multiple) pages
-    Object::add_extension('Image', 'LinkedImage');
+    Image::add_extension('LinkedImage');
 
 The `PortfolioPage` looks like this:
 
@@ -68,12 +57,55 @@ The `PortfolioPage` looks like this:
         }
         
         // Use this in your templates to get the correctly sorted images
+		// OR use $Images.Sort('SortOrder') in your templates which will unclutter your PHP classes
         public function SortedImages(){
             return $this->Images('', 'SortOrder ASC');
         }
     }
 
 Once this has been set up like described above, then you should be able to add images in the CMS and sort them by dragging them (use the thumbnail as handle).
+
+Example setup for has_many
+-------------
+
+As mentioned previously, a `many_many` relation is usually the better choice for Page -> File relations. If you still want a `has_many` relation, here's a way to do it.
+
+Let's assume we have a `PortfolioPage` that has multiple `PortfolioImages`. The `PortfolioImage` is a subclass of `Image` and looks like this:
+
+    class PortfolioImage extends Image
+    {
+        public static $has_one = array(
+            'PortfolioPage' => 'PortfolioPage'
+        );
+    }
+
+
+We enable sorting for `PortfolioImage` by adding the following line to `mysite/_config.php` (run `dev/build` afterwards):
+
+    // Make portfolio images sortable
+    PortfolioImage::add_extension('Sortable');
+
+The `PortfolioPage` looks like this:
+
+    class PortfolioPage extends Page
+    {   
+        public static $has_many = array(
+            'Images' => 'PortfolioImage'
+        );
+    
+        public function getCMSFields()
+        {
+            $fields = parent::getCMSFields();
+        
+            // Use SortableUploadField instead of UploadField!
+            $imageField = new SortableUploadField('Images', 'Portfolio images');
+        
+            $fields->addFieldToTab('Root.Images', $imageField);
+            return $fields;
+        }
+    }
+
+Once this has been set up like described above, you should be able to add images in the CMS and sort them by dragging them (use the thumbnail as handle).
 
 Templates
 -------------
@@ -88,6 +120,18 @@ Sorting the Files via a relation table isn't easily achievable via a DataExtensi
 And then in your templates use: 
 
         <% loop SortedImages %>
+        $SetWidth(500)
+        <% end_loop %>
+
+Alternatively, you could simply use the sort statement in your template, which will remove the need for a special getter method in your page class.
+
+        <% loop Images.Sort('SortOrder') %>
+        $SetWidth(500)
+        <% end_loop %>
+
+The above is only true for `many_many` relations. All `has_many` relations will be sorted automatically and you can just use:
+
+        <% loop Images %>
         $SetWidth(500)
         <% end_loop %>
     
