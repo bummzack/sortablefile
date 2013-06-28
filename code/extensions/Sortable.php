@@ -13,6 +13,8 @@ class Sortable extends DataExtension
 	
 	public static $sort_dir = 'ASC';
 	
+	protected static $sortTables = array();
+	
 	/**
 	 * @see DataExtension::augmentSQL()
 	 */
@@ -26,13 +28,18 @@ class Sortable extends DataExtension
 			in_array("count(*)",$select)
 		){ return; }
 		
-		$classes = array_reverse(ClassInfo::dataClassesFor($this->owner->class));
-		$class = null;
-		foreach($classes as $cls){
-			if(DataObject::has_own_table($cls)){
-				$class = $cls;
-				break;
+		if(!isset(self::$sortTables[$this->owner->class])){
+			$classes = array_reverse(ClassInfo::dataClassesFor($this->owner->class));
+			$class = null;
+			foreach($classes as $cls){
+				if(DataObject::has_own_table($cls) && isset(DataObject::database_fields($cls)['SortOrder'])){
+					$class = $cls;
+					break;
+				}
 			}
+			self::$sortTables[$this->owner->class] = $class;
+		} else {
+			$class = self::$sortTables[$this->owner->class];
 		}
 		
 		if($class){
