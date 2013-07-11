@@ -32,7 +32,7 @@ class Sortable extends DataExtension
 			$classes = array_reverse(ClassInfo::dataClassesFor($this->owner->class));
 			$class = null;
 			foreach($classes as $cls){
-				if(DataObject::has_own_table($cls) && isset(DataObject::database_fields($cls)['SortOrder'])){
+				if(DataObject::has_own_table($cls) && $fields = DataObject::database_fields($cls) && isset($fields['SortOrder'])){
 					$class = $cls;
 					break;
 				}
