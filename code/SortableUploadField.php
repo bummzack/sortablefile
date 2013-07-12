@@ -1,7 +1,6 @@
 <?php
 /**
  * Extension of the UploadField to add sorting of files
- * TODO: Check if we're actually getting a valid relation with "sortable" objects!
  *
  * @author bummzack
  */
@@ -28,44 +27,25 @@ class SortableUploadField extends UploadField
 	}
 	
 	/**
-	 * Each file that's being attached must have it's sort order set to the max value
-	 * of the current relation.
-	 * This only applies when we're dealing with many_many relations
-	 * @see UploadField::attachFile()
+	 * Add the field to the relation and set the sort order
+	 * @see UploadField::encodeFileAttributes()
 	 */
-	protected function attachFile($file) {
-		parent::attachFile($file);
+	protected function encodeFileAttributes(File $file) {
+		$attributes = parent::encodeFileAttributes($file);
+		$sortField = $this->getSortColumn();
+		
 		$record = $this->getRecord();
-		$name = $this->getName();
-		if ($record && $record->exists() && $record->many_many($name)) {
-			$sortField = $this->getSortColumn();
-			list($parentClass, $componentClass, $parentField, $componentField, $table) = $record->many_many($name);
-			
-			$q = sprintf(
-				'SELECT (MAX("%s") + 1) AS \'MaxSortValue\' FROM "%s" WHERE "%s" = %d',
-				$sortField,
-				$table,
-				$parentField,
-				$record->ID
-			);
-			$result = DB::query($q);
-			
-			if($result && $row = $result->first()){
-				$sort = $row['MaxSortValue'];
-				$q = sprintf(
-					'UPDATE "%s" SET "%s" = %d WHERE "%s" = %d AND "%s" = %d',
-					$table,
-					$sortField,
-					$sort,
-					$componentField,
-					$file->ID,
-					$parentField,
-					$record->ID
-				);
-				DB::query($q);
+		$relationName = $this->getName();
+		
+		if($record && $relationName && $list = $record->$relationName()){
+			if($record->many_many($relationName) !== null){
+				$list->add($file, array($sortField => $list->count() + 1));
 			}
 		}
+		
+		return $attributes;
 	}
+	
 	
 	/**
 	 * Set the column to be used for sorting
@@ -87,6 +67,37 @@ class SortableUploadField extends UploadField
 		$items = parent::getItems();
 		return $items->sort($this->getSortColumn(), 'ASC');
 	}
+	
+	public function saveInto(DataObjectInterface $record) {
+		$isNew = !$record->exists();
+		
+		parent::saveInto($record);
+		
+		
+		// if we're dealing with an unsaved record, we have to rebuild the relation list
+		// with the proper meny_many_extraFields attributes (eg. the sort order)
+		if($isNew){
+			// we have to grab the raw post data as the data is in the right order there.
+			// this is kind of a hack, but we simply lack the information about the client-side sorting otherwise
+			if(isset($_POST[$this->name]) && isset($_POST[$this->name]['Files']) && is_array($_POST[$this->name]['Files'])){
+				$idList = $_POST[$this->name]['Files'];
+			} else {
+				// take the ItemIDs as a fallback
+				$idList = $this->getItemIDs();
+			}
+			
+			$sortColumn = $this->getSortColumn();
+			$relationName = $this->getName();
+			if($relationName && $record->many_many($relationName) !== null && $list = $record->$relationName()){
+				$arrayList = $list->toArray();
+				foreach($arrayList as $item){
+					$list->remove($item);
+					$list->add($item, array($sortColumn => array_search($item->ID, $idList) + 1));
+				}
+			}
+		}
+		
+	}
 }
 
 class SortableUploadField_ItemHandler extends UploadField_ItemHandler 
@@ -104,7 +115,7 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 		
 		// Check if a new position is given
 		$newPosition = $request->getVar('newPosition');
-		
+		$oldPosition = $request->getVar('oldPosition');
 		if ($newPosition === ""){
 			return $this->httpError(403);
 		}
@@ -116,40 +127,36 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 		
 		// Check item permissions
 		$itemMoved = $this->getItem();
+		
 		if (!$itemMoved){
 			return $this->httpError(404);
 		}
-		
 		if (!$itemMoved->canEdit()){
 			return $this->httpError(403);
 		}
 		
 		// Only allow actions on files in the managed relation (if one exists)
 		$sortColumn = $this->parent->getSortColumn();
-		//if ($this->parent->managesRelation() && !$this->parent->getItems()->byID($itemMoved->ID)){
-		if (!$this->parent->getItems()->byID($itemMoved->ID)){
-			return $this->httpError(403);
-		}
 		
 		$relationName = $this->parent->getName();
 		$record = $this->parent->getRecord();
-		if ($record && $record->exists() && $record->hasMethod($relationName)) {
+		if ($record && $record->hasMethod($relationName)) {
 			$list = $record->$relationName();
 			$list = $list->sort($sortColumn, 'ASC');
-			$many_many = ($list instanceof ManyManyList);
-			if ($many_many) {
-				// we need to fetch $itemMoved again from the relation if its many_many so we get the
-				// SortOrder column from the relation table
-				$itemMoved = $list->byID($itemMoved->ID);
-				list($parentClass, $componentClass, $parentField, $componentField, $table) = $record->many_many($relationName);
-			}
+			
+			$is_many_many = $record->many_many($relationName) !== null;
 			
 			$i = 0;
 			$newPosition = intval($newPosition);
-			$oldPosition = intval($itemMoved->$sortColumn);
-			foreach ($list as $item) {
+			$oldPosition = intval($oldPosition);
+			$arrayList = $list->toArray();
+			$itemIsInList = false;
+			
+			foreach ($arrayList as $item) {
 				if ($item->ID == $itemMoved->ID) {
 					$sort = $newPosition;
+					// flag that we found our item in the list
+					$itemIsInList = true;
 				} else if ($i >= $newPosition && $i < $oldPosition) {
 					$sort = $i + 1;
 				} else if ($i <= $newPosition && $i > $oldPosition) {
@@ -157,23 +164,20 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 				} else {
 					$sort = $i;
 				}
-				if ($many_many) {
-					$q = sprintf(
-						'UPDATE "%s" SET "%s" = %d WHERE "%s" = %d AND "%s" = %d',
-						$table,
-						$sortColumn,
-						$sort,
-						$componentField,
-						$item->ID,
-						$parentField,
-						$record->ID
-					);
-					DB::query($q);
+				if ($is_many_many) {
+					$list->remove($item);
+					$list->add($item, array($sortColumn => $sort + 1));
 				} else {
-					$item->$sortColumn = $sort;
+					if(!$item->exists()){ $item->write(); }
+					$item->$sortColumn = $sort + 1;
 					$item->write();
 				}
 				$i++;
+			}
+			
+			// if the item wasn't in our list, add it now with the new sort position
+			if(!$itemIsInList && $is_many_many){
+				$list->add($itemMoved, array($sortColumn => $newPosition + 1));
 			}
 			
 			Requirements::clear();

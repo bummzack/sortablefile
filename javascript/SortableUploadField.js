@@ -5,11 +5,13 @@
 				onmatch: function() {
 					// enable sorting functionality
 					var self = $(this);
+					
 					self.sortable({ 
 						handle: ".ss-uploadfield-item-preview",
 						axis: "y",
 						start: function(event, ui){
 							// remove overflow on container
+							ui.item.data("oldPosition", ui.item.index())
 							self.css("overflow", "hidden");
 						},
 						stop: function(event, ui){
@@ -30,7 +32,10 @@
 								return;
 							}
 
-							$.get(url, { newPosition: (ui.item.index()) }, function(data, status){
+							$.get(url, { 
+								newPosition: (ui.item.index()), 
+								oldPosition: ui.item.data("oldPosition") 
+							}, function(data, status){
 								//window.console.log(data);
 							});
 						}
