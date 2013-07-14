@@ -3,7 +3,7 @@ sortablefile
 
 An extension for SilverStripe 3.1 that allows sorting of multiple attached images (extends UploadField).
 
-This is meant to be used with a `many_many` or `has_many` relation. The `many_many` relation should be preferred over the `has_many` relation, as it will allow you to add the same image/file to multiple pages and have individual sorting for each page.
+This is meant to be used with a `many_many` or `has_many` relation. The `many_many` relation should be preferred over the `has_many` relation, as it will allow you to add the same image/file to multiple pages and have individual sorting for images on each page.
 
 Installation
 ------------
@@ -19,7 +19,7 @@ First create an extension that will allow adding Images to several pages. We nam
     class LinkedImage extends DataExtension
     {
         // this image belongs to many pages. We use Page here, so that the image can be added to any page
-        public static $belongs_many_many = array(
+        private static $belongs_many_many = array(
             'Pages' => 'Page'   
         );
     }
@@ -35,13 +35,13 @@ The `PortfolioPage` looks like this:
     class PortfolioPage extends Page
     {   
         // This page can have many images
-        public static $many_many = array(
+        private static $many_many = array(
             'Images' => 'Image'
         );
         
         // this adds the SortOrder field to the relation table. Please note that the key (in this case 'Images') 
         // has to be the same key as in the $many_many definition!
-        public static $many_many_extraFields = array(
+        private static $many_many_extraFields = array(
             'Images' => array('SortOrder' => 'Int')
         );
     
@@ -59,7 +59,7 @@ The `PortfolioPage` looks like this:
         // Use this in your templates to get the correctly sorted images
 		// OR use $Images.Sort('SortOrder') in your templates which will unclutter your PHP classes
         public function SortedImages(){
-            return $this->Images('', 'SortOrder ASC');
+            return $this->Images()->Sort('SortOrder');
         }
     }
 
@@ -74,7 +74,7 @@ Let's assume we have a `PortfolioPage` that has multiple `PortfolioImages`. The 
 
     class PortfolioImage extends Image
     {
-        public static $has_one = array(
+        private static $has_one = array(
             'PortfolioPage' => 'PortfolioPage'
         );
     }
@@ -89,7 +89,7 @@ The `PortfolioPage` looks like this:
 
     class PortfolioPage extends Page
     {   
-        public static $has_many = array(
+        private static $has_many = array(
             'Images' => 'PortfolioImage'
         );
     
@@ -114,7 +114,7 @@ Sorting the Files via a relation table isn't easily achievable via a DataExtensi
 
         // Use this in your templates to get the correctly sorted images
         public function SortedImages(){
-            return $this->Images('', 'SortOrder ASC');
+            return $this->Images()->Sort('SortOrder');
         }
         
 And then in your templates use: 
