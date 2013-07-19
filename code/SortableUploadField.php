@@ -103,7 +103,10 @@ class SortableUploadField extends UploadField
 class SortableUploadField_ItemHandler extends UploadField_ItemHandler 
 {
 	private static $allowed_actions = array(
-		'sort' => true
+		'sort' => true,
+		'delete' => true,
+		'edit' => true,
+		'EditForm' => true
 	);
 	
 	/**
