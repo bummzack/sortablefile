@@ -7,7 +7,7 @@
  */
 class Sortable extends DataExtension
 {
-	public static $db = array(
+	private static $db = array(
 		'SortOrder' => 'Int'
 	);
 	
