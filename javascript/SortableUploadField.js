@@ -1,7 +1,7 @@
 ;(function($) {
 	$(function(){
 		$.entwine('ss', function($) {
-			$("ul.ss-uploadfield-files").entwine({
+			$(".sortableupload.ss-uploadfield ul.ss-uploadfield-files").entwine({
 				onmatch: function() {
 					// enable sorting functionality
 					var self = $(this);
