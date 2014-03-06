@@ -153,6 +153,11 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 			$newPosition = intval($newPosition);
 			$oldPosition = intval($oldPosition);
 			$arrayList = $list->toArray();
+			if ($is_many_many) {
+				// many_many_list not sortable
+				$arrayList = new ArrayList($arrayList);
+				$arrayList = $arrayList->sort($sortColumn, 'ASC');
+			}
 			$itemIsInList = false;
 			
 			foreach ($arrayList as $item) {
