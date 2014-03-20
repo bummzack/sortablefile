@@ -53,6 +53,7 @@ class SortableUploadField extends UploadField
 	 */
 	public function setSortColumn($sortColumn) {
 		$this->sortColumn = $sortColumn;
+		return $this;
 	}
 	
 	/**
