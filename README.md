@@ -7,31 +7,18 @@ This is meant to be used with a `many_many` or `has_many` relation. The `many_ma
 
 Installation
 ------------
+The easiest way is to use [composer](https://getcomposer.org/):
 
-Clone/download this repository into a folder called "sortablefile" in your SilverStripe installation folder. Run `dev/build` afterwards.
+    composer require bummzack/sortablefile 1.0.*@dev
+
+Alternatively, clone/download this repository into a folder called "sortablefile" in your SilverStripe installation folder. 
+
+Run `dev/build` afterwards.
 
 Example setup for many_many
 -------------
 
 Let's assume we have a `PortfolioPage` that has multiple `Images` attached. 
-First create an extension that will allow adding Images to several pages. We name it `LinkedImage`.
-
-```php
-class LinkedImage extends DataExtension
-{
-    // this image belongs to many pages. We use Page here, so that the image can be added to any page
-    private static $belongs_many_many = array(
-        'Pages' => 'Page'   
-    );
-}
-```
-
-We enable the above extension by adding the following line to `mysite/_config.php` (run `dev/build` afterwards!):
-
-```php
-// Make images attachable to (multiple) pages
-Image::add_extension('LinkedImage');
-```
 
 The `PortfolioPage` looks like this:
 
@@ -43,7 +30,8 @@ class PortfolioPage extends Page
         'Images' => 'Image'
     );
     
-    // this adds the SortOrder field to the relation table. Please note that the key (in this case 'Images') 
+    // this adds the SortOrder field to the relation table. 
+    // Please note that the key (in this case 'Images') 
     // has to be the same key as in the $many_many definition!
     private static $many_many_extraFields = array(
         'Images' => array('SortOrder' => 'Int')
@@ -61,7 +49,8 @@ class PortfolioPage extends Page
     }
     
     // Use this in your templates to get the correctly sorted images
-// OR use $Images.Sort('SortOrder') in your templates which will unclutter your PHP classes
+    // OR use $Images.Sort('SortOrder') in your templates which 
+    // will unclutter your PHP classes
     public function SortedImages(){
         return $this->Images()->Sort('SortOrder');
     }
@@ -73,12 +62,12 @@ Once this has been set up like described above, then you should be able to add i
 Example setup for has_many
 -------------
 
-As mentioned previously, a `many_many` relation is usually the better choice for Page -> File relations. If you still want a `has_many` relation, here's a way to do it.
+As mentioned previously, a `many_many` relation is usually the better choice for Page &rarr; File relations. If you still want a `has_many` relation, here's a way to do it.
 
-Let's assume we have a `PortfolioPage` that has multiple `PortfolioImages`. The `PortfolioImage` is a subclass of `Image` and looks like this:
+Let's assume we have a `PortfolioPage` that has multiple `Images`. To achieve that we create a `DataExtension` that looks like this:
 
 ```php
-class PortfolioImage extends Image
+class PortfolioImage extends DataExtension
 {
     private static $has_one = array(
         'PortfolioPage' => 'PortfolioPage'
@@ -86,12 +75,16 @@ class PortfolioImage extends Image
 }
 ```
 
-We enable sorting for `PortfolioImage` by adding the following line to `mysite/_config.php` (run `dev/build` afterwards):
+We enable the `PortfolioImage` extension by adding the following line to `mysite/_config/config.yml` (run `dev/build` afterwards):
 
-```php
-// Make portfolio images sortable
-PortfolioImage::add_extension('Sortable');
+```yml
+# put this in your mysite/_config/config.yml
+Image:
+  extensions:
+    - PortfolioImage
+    - Sortable
 ```
+
 
 The `PortfolioPage` looks like this:
 
