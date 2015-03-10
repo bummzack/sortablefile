@@ -147,6 +147,7 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 		if ($record && $record->hasMethod($relationName)) {
 			$list = $record->$relationName();
 			$list = $list->sort($sortColumn, 'ASC');
+			$listForeignKey = $list->getForeignKey();
 			
 			$is_many_many = $record->many_many($relationName) !== null;
 			
@@ -180,8 +181,16 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 			}
 			
 			// if the item wasn't in our list, add it now with the new sort position
-			if(!$itemIsInList && $is_many_many){
-				$list->add($itemMoved, array($sortColumn => $newPosition + 1));
+			if(!$itemIsInList){
+				if ($is_many_many) {
+					$list->add($itemMoved, array($sortColumn => $newPosition + 1));
+				}
+				else
+				{
+					$itemMoved->$listForeignKey = $record->ID;
+					$itemMoved->$sortColumn = intval($newPosition + 1);
+					$itemMoved->write();
+				}
 			}
 			
 			Requirements::clear();
