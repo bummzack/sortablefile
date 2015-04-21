@@ -6,12 +6,15 @@
 					// enable sorting functionality
 					var self = $(this);
 
+					// Get the action URL template (only thing that will change is the file ID).
+					var actionURL = $(this).siblings(".sortableupload-sortaction").data("action");
+
 					self.sortable({
 						handle: ".ss-uploadfield-item-preview",
 						axis: "y",
 						start: function(event, ui){
 							// remove overflow on container
-							ui.item.data("oldPosition", ui.item.index())
+							ui.item.data("oldPosition", ui.item.index());
 							self.css("overflow", "hidden");
 						},
 						stop: function(event, ui){
@@ -19,8 +22,6 @@
 							self.css("overflow", "auto");
 						},
 						update: function(event, ui){
-							// get the action URL
-							var actionURL = $(this).siblings(".sortableupload-sortaction").data("action");
 							// Get the current file ID
 							var fileID = ui.item.data("fileid");
 
