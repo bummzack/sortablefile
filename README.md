@@ -9,7 +9,7 @@ Installation
 ------------
 The easiest way is to use [composer](https://getcomposer.org/):
 
-    composer require bummzack/sortablefile 1.0.*@dev
+    composer require bummzack/sortablefile 1.1.*@dev
 
 Alternatively, clone/download this repository into a folder called "sortablefile" in your SilverStripe installation folder. 
 
@@ -92,7 +92,7 @@ The `PortfolioPage` looks like this:
 class PortfolioPage extends Page
 {   
     private static $has_many = array(
-        'Images' => 'PortfolioImage'
+        'Images' => 'Image'
     );
 
     public function getCMSFields()
