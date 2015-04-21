@@ -7,7 +7,7 @@
 					var self = $(this);
 
 					// Get the action URL template (only thing that will change is the file ID).
-					var actionURL = $(this).siblings(".sortableupload-sortaction").data("action");
+					var actionURL = self.siblings(".sortableupload-sortaction").data("action");
 
 					self.sortable({
 						handle: ".ss-uploadfield-item-preview",
