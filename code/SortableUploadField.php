@@ -11,42 +11,25 @@ class SortableUploadField extends UploadField
 	 */
 	protected $sortColumn = 'SortOrder';
 
-	/**
-	 * Keep track of files so we can drop extra information into the template via the ->Field() above. This is populated
-	 * via the ->customizeFile() method.
-	 *
-	 * @var File[]
-	 */
-	private $files = [];
-
 	public function Field($properties = array()) {
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery-ui.js');
 		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
 		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
 
-		$fieldID = $this->ID();
-
-		// Go through all files and setup a custom action link for each, including the security token (to authorize requests).
 		/** @var HTMLText $htmlText */
 		$htmlText = parent::Field($properties);
-		$html = $htmlText->getValue();
-		foreach($this->files as $file) {
+
+		// check if the record (to write into) exists. If not, there's no sort action to be used in the frontend
+		if($this->getRecord() && $this->getRecord()->exists()){
+			$html = $htmlText->getValue();
 			$token = $this->getForm()->getSecurityToken();
-			$action = $token->addToUrl($this->getItemHandler($file->ID)->Link("sort"));
-			$html .= "<input type='hidden' id='{$fieldID}_File_$file->ID' data-action='$action'>";
+			$action = $token->addToUrl($this->getItemHandler("{id}")->Link("sort"));
+			// add the sort action to the field, use {id} as a subsitute for the ID
+			$html .= "<input type='hidden' id='{$this->ID()}_FileSortAction' class='sortableupload-sortaction' data-action='$action'>";
+			$htmlText->setValue($html);
 		}
-		$htmlText->setValue($html);
 
 		return $htmlText;
-	}
-
-	/**
-	 * @param	File	$file
-	 * @return	ViewableData_Customised
-	 */
-	protected function customiseFile(File $file) {
-		$this->files[] = $file;
-		return parent::customiseFile($file);
 	}
 
 	/**
