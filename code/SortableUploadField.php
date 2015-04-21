@@ -90,7 +90,7 @@ class SortableUploadField extends UploadField
 
 
 		// if we're dealing with an unsaved record, we have to rebuild the relation list
-		// with the proper meny_many_extraFields attributes (eg. the sort order)
+		// with the proper many_many_extraFields attributes (eg. the sort order)
 		if($isNew){
 			// we have to grab the raw post data as the data is in the right order there.
 			// this is kind of a hack, but we simply lack the information about the client-side sorting otherwise
@@ -101,17 +101,36 @@ class SortableUploadField extends UploadField
 				$idList = $this->getItemIDs();
 			}
 
+			// Get general info about this relation (if possible)
 			$sortColumn = $this->getSortColumn();
 			$relationName = $this->getName();
-			if($relationName && $record->many_many($relationName) !== null && $list = $record->$relationName()){
-				$arrayList = $list->toArray();
-				foreach($arrayList as $item){
-					$list->remove($item);
-					$list->add($item, array($sortColumn => array_search($item->ID, $idList) + 1));
+			if($relationName) {
+				// Get relation type.
+				$isManyMany = ($record->many_many($relationName) !== null);
+				$isHasMany = ($record->has_many($relationName) !== null);
+				if ($isManyMany || $isHasMany) {
+					// Get list from that relation and begin to manipulate it.
+					$list = $record->$relationName();
+					$arrayList = $list->toArray();
+					foreach($arrayList as $item){
+						// Get the specified sort order for this item (offset from posted 0 index).
+						$sortOrder = array_search($item->ID, $idList) + 1;
+
+						// The method by which we update this relation varies depending on the relationship type...
+						if ($isManyMany) {
+							// Alter data in the pivot table.
+							$list->remove($item);
+							$list->add($item, array($sortColumn => $sortOrder));
+						} elseif ($isHasMany) {
+							// Just update information in the sort field directly on the item itself.
+							$item->$sortColumn = $sortOrder;
+							$item->write();
+						}
+					}
 				}
 			}
 		}
-		
+
 	}
 }
 
