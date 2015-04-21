@@ -23,9 +23,9 @@ class SortableUploadField extends UploadField
 		if($this->getRecord() && $this->getRecord()->exists()){
 			$html = $htmlText->getValue();
 			$token = $this->getForm()->getSecurityToken();
-			$action = $token->addToUrl($this->getItemHandler("{id}")->Link("sort"));
-			// add the sort action to the field, use {id} as a subsitute for the ID
-			$html .= "<input type='hidden' id='{$this->ID()}_FileSortAction' class='sortableupload-sortaction' data-action='$action'>";
+			$action = Convert::raw2att($token->addToUrl($this->getItemHandler("{id}")->Link("sort")));
+			// add the sort action to the field, use {id} as a substitute for the ID
+			$html .= "<input type=\"hidden\" id=\"{$this->ID()}_FileSortAction\" class=\"sortableupload-sortaction\" data-action=\"$action\">";
 			$htmlText->setValue($html);
 		}
 
