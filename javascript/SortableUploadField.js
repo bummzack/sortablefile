@@ -5,8 +5,8 @@
 				onmatch: function() {
 					// enable sorting functionality
 					var self = $(this);
-					
-					self.sortable({ 
+
+					self.sortable({
 						handle: ".ss-uploadfield-item-preview",
 						axis: "y",
 						start: function(event, ui){
@@ -19,22 +19,13 @@
 							self.css("overflow", "auto");
 						},
 						update: function(event, ui){
-							var url = ui.item.find('button.ss-uploadfield-item-remove').data('href');
-							if(!url){
-								url = ui.item.find('button.ss-uploadfield-item-delete').data('href');
-							}
-							// horrible hack to get a valid endpoint for our sort query
-							// still less cumbersome than overriding the required methods in UploadField though
-							if(url.match(/\/(remove|delete)\?/)){
-								url = url.replace(/\/(remove|delete)\?/, "/sort?");
-							} else {
-								// seems like we have an invald url
-								return;
-							}
+							// Use the current file ID to determine a URL to the correct sort action handler.
+							var fileID = ui.item.data("fileid");
+							var actionURL = $("#SortableUploadField_File_" + fileID).data("action");
 
-							$.get(url, { 
-								newPosition: (ui.item.index()), 
-								oldPosition: ui.item.data("oldPosition") 
+							$.get(actionURL, {
+								newPosition: (ui.item.index()),
+								oldPosition: ui.item.data("oldPosition")
 							}, function(data, status){
 								//window.console.log(data);
 							});

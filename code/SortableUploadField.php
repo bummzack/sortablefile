@@ -4,20 +4,49 @@
  *
  * @author bummzack
  */
-class SortableUploadField extends UploadField 
+class SortableUploadField extends UploadField
 {
 	/**
 	 * @var string the column to be used for sorting
 	 */
 	protected $sortColumn = 'SortOrder';
-	
+
+	/**
+	 * Keep track of files so we can drop extra information into the template via the ->Field() above. This is populated
+	 * via the ->customizeFile() method.
+	 *
+	 * @var File[]
+	 */
+	private $files = [];
+
 	public function Field($properties = array()) {
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery-ui.js');
 		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
 		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
-		return parent::Field($properties);
+
+		// Go through all files and setup a custom action link for each, including the security token (to authorize requests).
+		/** @var HTMLText $htmlText */
+		$htmlText = parent::Field($properties);
+		$html = $htmlText->getValue();
+		foreach($this->files as $file) {
+			$token = $this->getForm()->getSecurityToken();
+			$action = $token->addToUrl($this->getItemHandler($file->ID)->Link("sort"));
+			$html .= "<input type='hidden' id='SortableUploadField_File_$file->ID' data-action='$action'>";
+		}
+		$htmlText->setValue($html);
+
+		return $htmlText;
 	}
-	
+
+	/**
+	 * @param	File	$file
+	 * @return	ViewableData_Customised
+	 */
+	protected function customiseFile(File $file) {
+		$this->files[] = $file;
+		return parent::customiseFile($file);
+	}
+
 	/**
 	 * @param int $itemID
 	 * @return UploadField_ItemHandler
@@ -25,7 +54,7 @@ class SortableUploadField extends UploadField
 	public function getItemHandler($itemID) {
 		return SortableUploadField_ItemHandler::create($this, $itemID);
 	}
-	
+
 	/**
 	 * Add the field to the relation and set the sort order
 	 * @see UploadField::encodeFileAttributes()
@@ -33,20 +62,20 @@ class SortableUploadField extends UploadField
 	protected function encodeFileAttributes(File $file) {
 		$attributes = parent::encodeFileAttributes($file);
 		$sortField = $this->getSortColumn();
-		
+
 		$record = $this->getRecord();
 		$relationName = $this->getName();
-		
+
 		if($record && $relationName && $list = $record->$relationName()){
 			if($record->many_many($relationName) !== null){
 				$list->add($file, array($sortField => $list->count() + 1));
 			}
 		}
-		
+
 		return $attributes;
 	}
-	
-	
+
+
 	/**
 	 * Set the column to be used for sorting
 	 * @param string $sortColumn
@@ -55,7 +84,7 @@ class SortableUploadField extends UploadField
 		$this->sortColumn = $sortColumn;
 		return $this;
 	}
-	
+
 	/**
 	 * Returns the column to be used for sorting
 	 * @return string
@@ -63,18 +92,18 @@ class SortableUploadField extends UploadField
 	public function getSortColumn() {
 		return $this->sortColumn;
 	}
-	
+
 	public function getItems() {
 		$items = parent::getItems();
 		return $items->sort($this->getSortColumn(), 'ASC');
 	}
-	
+
 	public function saveInto(DataObjectInterface $record) {
 		$isNew = !$record->exists();
-		
+
 		parent::saveInto($record);
-		
-		
+
+
 		// if we're dealing with an unsaved record, we have to rebuild the relation list
 		// with the proper meny_many_extraFields attributes (eg. the sort order)
 		if($isNew){
@@ -86,7 +115,7 @@ class SortableUploadField extends UploadField
 				// take the ItemIDs as a fallback
 				$idList = $this->getItemIDs();
 			}
-			
+
 			$sortColumn = $this->getSortColumn();
 			$relationName = $this->getName();
 			if($relationName && $record->many_many($relationName) !== null && $list = $record->$relationName()){
@@ -101,7 +130,7 @@ class SortableUploadField extends UploadField
 	}
 }
 
-class SortableUploadField_ItemHandler extends UploadField_ItemHandler 
+class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 {
 	private static $allowed_actions = array(
 		'sort' => true,
@@ -109,54 +138,54 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 		'edit' => true,
 		'EditForm' => true
 	);
-	
+
 	/**
 	 * Action to handle sorting of a single file
 	 *
 	 * @param SS_HTTPRequest $request
 	 */
 	public function sort(SS_HTTPRequest $request) {
-		
+
 		// Check if a new position is given
 		$newPosition = $request->getVar('newPosition');
 		$oldPosition = $request->getVar('oldPosition');
 		if ($newPosition === ""){
 			return $this->httpError(403);
 		}
-		
+
 		// Check form field state
 		if ($this->parent->isDisabled() || $this->parent->isReadonly()){
 			return $this->httpError(403);
 		}
-		
+
 		// Check item permissions
 		$itemMoved = $this->getItem();
-		
+
 		if (!$itemMoved){
 			return $this->httpError(404);
 		}
 		if (!$itemMoved->canEdit()){
 			return $this->httpError(403);
 		}
-		
+
 		// Only allow actions on files in the managed relation (if one exists)
 		$sortColumn = $this->parent->getSortColumn();
-		
+
 		$relationName = $this->parent->getName();
 		$record = $this->parent->getRecord();
 		if ($record && $record->hasMethod($relationName)) {
 			$list = $record->$relationName();
 			$list = $list->sort($sortColumn, 'ASC');
 			$listForeignKey = $list->getForeignKey();
-			
+
 			$is_many_many = $record->many_many($relationName) !== null;
-			
+
 			$i = 0;
 			$newPosition = intval($newPosition);
 			$oldPosition = intval($oldPosition);
 			$arrayList = $list->toArray();
 			$itemIsInList = false;
-			
+
 			foreach ($arrayList as $item) {
 				if ($item->ID == $itemMoved->ID) {
 					$sort = $newPosition;
@@ -179,12 +208,12 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 				}
 				$i++;
 			}
-			
+
 			// if the item wasn't in our list, add it now with the new sort position
 			if(!$itemIsInList){
 				if ($is_many_many) {
-					$list->add($itemMoved, array($sortColumn => $newPosition + 1));
-				}
+				$list->add($itemMoved, array($sortColumn => $newPosition + 1));
+			}
 				else
 				{
 					$itemMoved->$listForeignKey = $record->ID;
@@ -192,13 +221,13 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 					$itemMoved->write();
 				}
 			}
-			
+
 			Requirements::clear();
 			return "1";
 		}
 		return $this->httpError(403);
 	}
-	
+
 	/**
 	 * @return string
 	 */
