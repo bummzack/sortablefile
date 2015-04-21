@@ -24,6 +24,8 @@ class SortableUploadField extends UploadField
 		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
 		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
 
+		$fieldID = $this->ID();
+
 		// Go through all files and setup a custom action link for each, including the security token (to authorize requests).
 		/** @var HTMLText $htmlText */
 		$htmlText = parent::Field($properties);
@@ -31,7 +33,7 @@ class SortableUploadField extends UploadField
 		foreach($this->files as $file) {
 			$token = $this->getForm()->getSecurityToken();
 			$action = $token->addToUrl($this->getItemHandler($file->ID)->Link("sort"));
-			$html .= "<input type='hidden' id='SortableUploadField_File_$file->ID' data-action='$action'>";
+			$html .= "<input type='hidden' id='{$fieldID}_File_$file->ID' data-action='$action'>";
 		}
 		$htmlText->setValue($html);
 
