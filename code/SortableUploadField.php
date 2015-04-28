@@ -106,8 +106,8 @@ class SortableUploadField extends UploadField
 			$relationName = $this->getName();
 			if($relationName) {
 				// Get relation type.
-				$isManyMany = ($record->many_many($relationName) !== null);
-				$isHasMany = ($record->has_many($relationName) !== null);
+				$isManyMany = ($record->many_many($relationName) !== null); // Using "null" here since we know it will properly return null if there is no many_many component by this name.
+				$isHasMany = (bool) $record->has_many($relationName); // TODO: Return to more strict check of === null here when SS framework issue is mainstream: https://github.com/silverstripe/silverstripe-framework/pull/4130
 				if ($isManyMany || $isHasMany) {
 					// Get list from that relation and begin to manipulate it.
 					$list = $record->$relationName();
