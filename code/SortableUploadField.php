@@ -12,12 +12,11 @@ class SortableUploadField extends UploadField
 	protected $sortColumn = 'SortOrder';
 
 	public function Field($properties = array()) {
-		Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery-ui.js');
-		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
-		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
-
 		/** @var HTMLText $htmlText */
 		$htmlText = parent::Field($properties);
+
+		Requirements::javascript(SORTABLEFILE_DIR . '/javascript/SortableUploadField.js');
+		Requirements::css(SORTABLEFILE_DIR . '/css/SortableUploadField.css');
 
 		// check if the record (to write into) exists. If not, there's no sort action to be used in the frontend
 		if($this->getRecord() && $this->getRecord()->exists()){
