@@ -11,6 +11,11 @@ class SortableUploadField extends UploadField
 	 */
 	protected $sortColumn = 'SortOrder';
 
+	/**
+	 * @var bool whether or not the field should check access permissions when sorting. Defaults to true.
+	 */
+	protected $enablePermissionCheck = true;
+
 	public function Field($properties = array()) {
 		/** @var HTMLText $htmlText */
 		$htmlText = parent::Field($properties);
@@ -59,6 +64,22 @@ class SortableUploadField extends UploadField
 		return $attributes;
 	}
 
+	/**
+	 * Set whether or not permissions should be checked when sorting.
+	 * Defaults to true.
+	 * @param bool $value
+	 */
+	public function setEnablePermissionCheck($value){
+		$this->enablePermissionCheck = ($value == true);
+	}
+
+	/**
+	 * Whether or not permissions are being checked for sorting.
+	 * @return bool
+	 */
+	public function getEnablePermissionCheck(){
+		return $this->enablePermissionCheck;
+	}
 
 	/**
 	 * Set the column to be used for sorting
@@ -167,7 +188,8 @@ class SortableUploadField_ItemHandler extends UploadField_ItemHandler
 		if (!$itemMoved){
 			return $this->httpError(404);
 		}
-		if (!$itemMoved->canEdit()){
+		
+		if ($this->parent->enablePermissionCheck && !$itemMoved->canEdit()){
 			return $this->httpError(403);
 		}
 
