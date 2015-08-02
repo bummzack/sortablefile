@@ -100,7 +100,7 @@ class SortableUploadField extends UploadField
 
 	public function getItems() {
 		$items = parent::getItems();
-		return $items->sort($this->getSortColumn(), 'ASC');
+		return $items->sort(array($this->getSortColumn() => 'ASC', 'ID' => 'ASC'));
 	}
 
 	public function saveInto(DataObjectInterface $record) {
