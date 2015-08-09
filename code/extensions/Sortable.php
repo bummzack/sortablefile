@@ -55,7 +55,7 @@ class Sortable extends DataExtension
 	 */
 	public function onBeforeWrite()
 	{
-		if((!$this->owner->ID && !$this->owner->SortOrder) || !$this->owner->SortOrder) {
+		if(!$this->owner->SortOrder) {
 			$classes = ClassInfo::dataClassesFor($this->owner->ClassName);
 		    $sql = new SQLQuery('count(ID)', array_shift($classes));
 		    $val = $sql->execute()->value();
