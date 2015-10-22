@@ -1,7 +1,7 @@
 sortablefile
 ============
 
-An extension for SilverStripe 3.1 that allows sorting of multiple attached images (extends UploadField).
+An extension for SilverStripe 3.1 and 3.2 that allows sorting of multiple attached images (extends UploadField).
 
 This is meant to be used with a `many_many` or `has_many` relation. The `many_many` relation should be preferred over the `has_many` relation, as it will allow you to add the same image/file to multiple pages and have individual sorting for images on each page.
 
@@ -9,8 +9,8 @@ Installation
 ------------
 The easiest way is to use [composer](https://getcomposer.org/):
 
-    composer require bummzack/sortablefile 1.1.*@dev
-
+    composer require bummzack/sortablefile
+    
 Alternatively, clone/download this repository into a folder called "sortablefile" in your SilverStripe installation folder. 
 
 Run `dev/build` afterwards.
