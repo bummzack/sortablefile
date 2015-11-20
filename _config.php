@@ -1,7 +1,7 @@
 <?php
 /**
  * Simple extension to the UploadField class that allows sorting of multiple files.
- * 
+ *
  * Works with has_many and many_many relations.
  */
 
