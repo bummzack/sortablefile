@@ -60,7 +60,7 @@ class Sortable extends DataExtension
     {
         if (!$this->owner->exists() || !$this->owner->SortOrder) {
             $classes = ClassInfo::dataClassesFor($this->owner->ClassName);
-            $sql = new SQLQuery('MAX("SortOrder")', array_shift($classes));
+            $sql = new SQLQuery('MAX("SortOrder")', '"'. array_shift($classes) .'"');
             $val = $sql->execute()->value();
             $this->owner->SortOrder = is_numeric($val) ? $val + 1 : 1;
         }
