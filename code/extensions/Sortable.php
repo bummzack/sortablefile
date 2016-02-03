@@ -32,14 +32,8 @@ class Sortable extends DataExtension
         }
 
         if (!isset(self::$sortTables[$this->owner->class])) {
-            $classes = array_reverse(ClassInfo::dataClassesFor($this->owner->class));
-            $class = null;
-            foreach ($classes as $cls) {
-                if (DataObject::has_own_table($cls) && ($fields = DataObject::database_fields($cls)) && isset($fields['SortOrder'])) {
-                    $class = $cls;
-                    break;
-                }
-            }
+            // look up the table that has the SortOrder field
+            $class = ClassInfo::table_for_object_field($this->owner->class, 'SortOrder');
             self::$sortTables[$this->owner->class] = $class;
         } else {
             $class = self::$sortTables[$this->owner->class];
@@ -59,8 +53,9 @@ class Sortable extends DataExtension
     public function onBeforeWrite()
     {
         if (!$this->owner->exists() || !$this->owner->SortOrder) {
-            $classes = ClassInfo::dataClassesFor($this->owner->ClassName);
-            $sql = new SQLQuery('MAX("SortOrder")', '"'. array_shift($classes) .'"');
+            // get the table in the ancestry that has the SortOrder field
+            $table = ClassInfo::table_for_object_field($this->owner->class, 'SortOrder');
+            $sql = new SQLQuery('MAX("SortOrder")', $table);
             $val = $sql->execute()->value();
             $this->owner->SortOrder = is_numeric($val) ? $val + 1 : 1;
         }
