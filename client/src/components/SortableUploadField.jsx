@@ -29,7 +29,7 @@ const enhancedUploadField = (UploadField) => {
 
     render() {
       return (
-        <SortableList items={this.props.files} onSortEnd={this.onSortEnd}>
+        <SortableList items={this.props.files} lockAxis="y" onSortEnd={this.onSortEnd}>
           <UploadField {...this.props} />
         </SortableList>
       );

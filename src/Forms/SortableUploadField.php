@@ -20,10 +20,6 @@ class SortableUploadField extends UploadField
      */
     protected $sortColumn = 'SortOrder';
 
-    /**
-     * @var bool whether or not the field should check access permissions when sorting. Defaults to true.
-     */
-    protected $enablePermissionCheck = true;
 
     public function Field($properties = [])
     {

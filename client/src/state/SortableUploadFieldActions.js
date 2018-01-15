@@ -4,6 +4,6 @@ export function changeSort(fieldId, oldIndex, newIndex) {
   return (dispatch) =>
     dispatch({
       type: ACTION_TYPES.SORTABLE_UPLOADFIELD_SORT,
-      payload: { fieldId, oldIndex, newIndex },
+      payload: {fieldId, oldIndex, newIndex},
     });
 }
