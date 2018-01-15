@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import {SortableContainer} from 'react-sortable-hoc';
 import * as actions from 'state/SortableUploadFieldActions';
 
+//TODO: Is this really needed?
 const SortableList = SortableContainer((props) => {
   return props.children;
 });
@@ -28,6 +29,11 @@ const enhancedUploadField = (UploadField) => {
     };
 
     render() {
+      if (!this.props.sortable) {
+        return (
+          <UploadField {...this.props} />
+        );
+      }
       return (
         <SortableList items={this.props.files} lockAxis="y" onSortEnd={this.onSortEnd}>
           <UploadField {...this.props} />

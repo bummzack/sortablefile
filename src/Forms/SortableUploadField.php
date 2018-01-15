@@ -20,6 +20,12 @@ class SortableUploadField extends UploadField
      */
     protected $sortColumn = 'SortOrder';
 
+    public function getSchemaDataDefaults()
+    {
+        $defaults = parent::getSchemaDataDefaults();
+        $defaults['sortable'] = true;
+        return $defaults;
+    }
 
     public function Field($properties = [])
     {
