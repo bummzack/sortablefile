@@ -1,45 +1,41 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import {SortableContainer} from 'react-sortable-hoc';
+import * as actions from 'state/SortableUploadFieldActions';
 
 const SortableList = SortableContainer((props) => {
   return props.children;
 });
 
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: {
+      uploadField: bindActionCreators(actions, dispatch),
+    },
+  };
+}
+
 const enhancedUploadField = (UploadField) => {
-  return class SortableUploadField extends Component {
+  class SortableUploadField extends Component {
     constructor(props) {
       super(props);
-      this.state = {
-        sortedFiles: props.files || []
-      };
       this.onSortEnd = this.onSortEnd.bind(this);
     };
 
-    componentWillReceiveProps(nextProps) {
-      if (nextProps.files !== this.props.files) {
-        this.setState({
-          sortedFiles: nextProps.files
-        })
-      }
-    }
-
     onSortEnd({oldIndex, newIndex}) {
-      if (this.state.sortedFiles) {
-        this.setState({
-          sortedFiles: arrayMove(this.state.sortedFiles, oldIndex, newIndex),
-        });
-      }
+      this.props.actions.uploadField.changeSort(this.props.id, oldIndex, newIndex);
     };
 
     render() {
-      const newProps = {...this.props, files: this.state.sortedFiles};
       return (
-        <SortableList items={this.state.sortedFiles} onSortEnd={this.onSortEnd}>
-          <UploadField {...newProps} />
+        <SortableList items={this.props.files} onSortEnd={this.onSortEnd}>
+          <UploadField {...this.props} />
         </SortableList>
       );
     }
-  };
+  }
+  return connect(null, mapDispatchToProps)(SortableUploadField);
 };
 
 export default enhancedUploadField;
