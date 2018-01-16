@@ -22,20 +22,29 @@ const enhancedUploadField = (UploadField) => {
     constructor(props) {
       super(props);
       this.onSortEnd = this.onSortEnd.bind(this);
+      this.cancelStartHandler = this.cancelStartHandler.bind(this);
     };
 
     onSortEnd({oldIndex, newIndex}) {
       this.props.actions.uploadField.changeSort(this.props.id, oldIndex, newIndex);
     };
 
-    render() {
+    cancelStartHandler(e){
       if (!this.props.sortable) {
-        return (
-          <UploadField {...this.props} />
-        );
+        return true;
       }
+
+      // Cancel sorting if the event target is an `input`, `textarea`, `select` or `option`
+      const disabledElements = ['input', 'textarea', 'select', 'option', 'button'];
+
+      if (disabledElements.indexOf(e.target.tagName.toLowerCase()) !== -1) {
+        return true; // Return true to cancel sorting
+      }
+    };
+
+    render() {
       return (
-        <SortableList items={this.props.files} lockAxis="y" onSortEnd={this.onSortEnd}>
+        <SortableList items={this.props.files} lockAxis="y" onSortEnd={this.onSortEnd} shouldCancelStart={this.cancelStartHandler}>
           <UploadField {...this.props} />
         </SortableList>
       );
