@@ -1,6 +1,6 @@
 {
   "name": "bummzack-sortablefile",
-  "version": "0.0.0",
+  "version": "2.0.0",
   "description": "",
   "license": "BSD-3-Clause",
   "author": "Bummzack",
@@ -12,64 +12,18 @@
     "dev": "NODE_ENV=development webpack --progress",
     "watch": "yarn && NODE_ENV=development webpack --watch --progress",
     "css": "yarn && WEBPACK_CHILD=css webpack -p --bail --progress",
-    "test": "jest",
-    "coverage": "jest --coverage",
     "lock": "npm-shrinkwrap --dev",
     "lint": "eslint client/src && sass-lint -v client/src"
   },
-  "jest": {
-    "roots": [
-      "client/src"
-    ],
-    "modulePaths": [
-      "client/src",
-      "../admin/client/src",
-      "../admin/node_modules",
-      "vendor/silverstripe/admin/client/src",
-      "vendor/silverstripe/admin/node_modules",
-      "../asset-admin/client/src",
-      "vendor/silverstripe/asset-admin/client/src"
-    ],
-    "testMatch": [
-      "**/tests/**/*-test.js?(x)"
-    ],
-    "transform": {
-      ".*": "babel-jest"
-    }
-  },
   "devDependencies": {
-    "@silverstripe/webpack-config": "^0.4.0",
-    "babel-jest": "^19.0.0",
-    "babel-preset-es2015": "^6.24.1",
-    "jest-cli": "^19.0.2"
+    "@silverstripe/webpack-config": "^0.7.0"
   },
   "dependencies": {
-    "apollo-client": "^0.5.22",
-    "babel-polyfill": "6.7.4",
-    "bootstrap": "4.0.0-beta",
-    "classnames": "^2.2.5",
-    "deep-freeze-strict": "^1.1.1",
-    "graphql-fragments": "^0.1.0",
-    "graphql-tag": "^0.1.17",
-    "griddle-react": "^0.7.0",
-    "qs": "^6.2.1",
     "react": "15.3.1",
-    "react-addons-css-transition-group": "15.3.1",
-    "react-addons-test-utils": "15.3.1",
-    "react-apollo": "^0.7.1",
-    "react-bootstrap-ss": "^0.30.10",
-    "react-dnd": "^2.2.3",
-    "react-dnd-html5-backend": "^2.2.3",
     "react-dom": "15.3.1",
     "react-redux": "^4.4.5",
-    "react-router": "^2.5.2",
-    "react-router-redux": "^4.0.5",
-    "react-selectable": "^1.3.3",
     "react-sortable-hoc": "^0.6.8",
-    "redux": "^3.3.1",
-    "redux-form": "^6.0.2",
-    "redux-logger": "^2.4.0",
-    "redux-thunk": "^1.0.3"
+    "redux": "^3.3.1"
   },
   "babel": {
     "presets": [

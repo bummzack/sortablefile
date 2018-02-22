@@ -1,21 +1,36 @@
 import React, {Component} from 'react';
 import {SortableElement} from 'react-sortable-hoc';
+import {connect} from "react-redux";
 
 const SortableItem = SortableElement((props) =>
   <div className="sortable-item">{props.children}</div>
 );
 
+function mapStateToProps(state, ownprops) {
+  const id = `Form_EditForm_${ownprops.name}`;
+  let files = [];
+  if (state.assetAdmin
+    && state.assetAdmin.uploadField
+    && state.assetAdmin.uploadField.fields
+    && state.assetAdmin.uploadField.fields[id]
+  ) {
+    files = state.assetAdmin.uploadField.fields[id].files || [];
+  }
+  return { files };
+}
+
 const enhancedUploadFieldItem = (UploadFieldItem) => {
-  return class SortableUploadFieldItem extends Component {
+  class SortableUploadFieldItem extends Component {
     render() {
+      const index = this.props.files.findIndex(file => this.props.item.id === file.id);
       return (
-        <SortableItem index={this.props.index}>
+        <SortableItem index={index}>
           <UploadFieldItem {...this.props} />
         </SortableItem>
       );
     }
   }
-  //return inject(['UploadFieldItem'])(SortableUploadField);
+  return connect(mapStateToProps)(SortableUploadFieldItem);
 };
 
 export default enhancedUploadFieldItem;

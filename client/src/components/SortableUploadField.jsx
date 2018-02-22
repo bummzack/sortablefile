@@ -50,6 +50,7 @@ const enhancedUploadField = (UploadField) => {
       );
     }
   }
+
   return connect(null, mapDispatchToProps)(SortableUploadField);
 };
 
