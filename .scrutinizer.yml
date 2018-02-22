@@ -1,4 +1,3 @@
-
 inherit: true
 
 tools:
@@ -10,4 +9,4 @@ checks:
     duplication: true
 
 filter:
-  paths: [code/*, tests/*]
+  paths: [src/*, tests/*]
