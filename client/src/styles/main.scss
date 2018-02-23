@@ -1,0 +1,37 @@
+.sortable-item {
+  $radius: .192rem;
+  border: 1px solid #ced5e1;
+  border-radius: 0;
+  overflow: hidden;
+
+  .uploadfield__dropzone + &, &:first-of-type {
+    border-top-left-radius: $radius;
+    border-top-right-radius: $radius;
+  }
+
+  &:last-of-type {
+    border-bottom-left-radius: $radius;
+    border-bottom-right-radius: $radius;
+  }
+
+  &--dragging {
+    border-radius: $radius;
+  }
+
+  // Reset the wrapped-component
+  .uploadfield-item {
+    &, &:first-child, &:last-child {
+      border: 0;
+      height: 60px;
+      border-radius: 0;
+    }
+    &__thumbnail {
+      border-radius: 0;
+    }
+  }
+
+  & + & {
+    // Collapse borders
+    margin-top: -1px;
+  }
+}

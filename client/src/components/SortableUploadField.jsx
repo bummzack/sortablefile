@@ -44,7 +44,13 @@ const enhancedUploadField = (UploadField) => {
 
     render() {
       return (
-        <SortableList items={this.props.files} lockAxis="y" onSortEnd={this.onSortEnd} shouldCancelStart={this.cancelStartHandler}>
+        <SortableList
+          items={this.props.files}
+          lockAxis="y"
+          onSortEnd={this.onSortEnd}
+          shouldCancelStart={this.cancelStartHandler}
+          helperClass="sortable-item--dragging"
+        >
           <UploadField {...this.props} />
         </SortableList>
       );

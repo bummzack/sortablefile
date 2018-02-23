@@ -7,6 +7,7 @@ const SortableItem = SortableElement((props) =>
 );
 
 function mapStateToProps(state, ownprops) {
+  //TODO: This is flawed on many levels. Not all forms will have that namespace
   const id = `Form_EditForm_${ownprops.name}`;
   let files = [];
   if (state.assetAdmin
