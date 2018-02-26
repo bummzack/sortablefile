@@ -2,7 +2,10 @@ import React, {Component} from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {SortableContainer} from 'react-sortable-hoc';
+import enhancedUploadFieldItem from 'components/SortableUploadFieldItem';
 import * as actions from 'state/SortableUploadFieldActions';
+import { inject } from 'lib/Injector';
+
 
 //TODO: Is this really needed?
 const SortableList = SortableContainer((props) => {
@@ -22,6 +25,7 @@ const enhancedUploadField = (UploadField) => {
     constructor(props) {
       super(props);
       this.onSortEnd = this.onSortEnd.bind(this);
+      this.DecoratedUploadFieldItem = enhancedUploadFieldItem(props.UploadFieldItem);
       this.cancelStartHandler = this.cancelStartHandler.bind(this);
     };
 
@@ -43,6 +47,12 @@ const enhancedUploadField = (UploadField) => {
     };
 
     render() {
+      if (!this.props.sortable) {
+        return <UploadField {...this.props} />
+      }
+
+      const newProps = {...this.props, UploadFieldItem: this.DecoratedUploadFieldItem };
+
       return (
         <SortableList
           items={this.props.files}
@@ -51,13 +61,15 @@ const enhancedUploadField = (UploadField) => {
           shouldCancelStart={this.cancelStartHandler}
           helperClass="sortable-item--dragging"
         >
-          <UploadField {...this.props} />
+          <UploadField {...newProps} />
         </SortableList>
       );
     }
   }
 
-  return connect(null, mapDispatchToProps)(SortableUploadField);
+  return connect(null, mapDispatchToProps)(
+    inject(['UploadFieldItem'])(SortableUploadField)
+  );
 };
 
 export default enhancedUploadField;

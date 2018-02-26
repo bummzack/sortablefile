@@ -99,8 +99,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 document.addEventListener('DOMContentLoaded', function () {
   _Injector2.default.transform('enhance-uploadfield', function (updater) {
     updater.component('UploadField', _SortableUploadField2.default, 'SortableUploadField');
-
-    updater.component('UploadFieldItem', _SortableUploadFieldItem2.default, 'SortableUploadFieldItem');
     updater.reducer('assetAdmin', _SortableUploadFieldReducerTransformer2.default);
   });
 });
@@ -117,6 +115,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(0);
@@ -129,9 +129,15 @@ var _redux = __webpack_require__(4);
 
 var _reactSortableHoc = __webpack_require__("./node_modules/react-sortable-hoc/dist/commonjs/index.js");
 
+var _SortableUploadFieldItem = __webpack_require__("./client/src/components/SortableUploadFieldItem.jsx");
+
+var _SortableUploadFieldItem2 = _interopRequireDefault(_SortableUploadFieldItem);
+
 var _SortableUploadFieldActions = __webpack_require__("./client/src/state/SortableUploadFieldActions.js");
 
 var actions = _interopRequireWildcard(_SortableUploadFieldActions);
+
+var _Injector = __webpack_require__(3);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -165,6 +171,7 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
       var _this = _possibleConstructorReturn(this, (SortableUploadField.__proto__ || Object.getPrototypeOf(SortableUploadField)).call(this, props));
 
       _this.onSortEnd = _this.onSortEnd.bind(_this);
+      _this.DecoratedUploadFieldItem = (0, _SortableUploadFieldItem2.default)(props.UploadFieldItem);
       _this.cancelStartHandler = _this.cancelStartHandler.bind(_this);
       return _this;
     }
@@ -193,6 +200,12 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
     }, {
       key: 'render',
       value: function render() {
+        if (!this.props.sortable) {
+          return _react2.default.createElement(UploadField, this.props);
+        }
+
+        var newProps = _extends({}, this.props, { UploadFieldItem: this.DecoratedUploadFieldItem });
+
         return _react2.default.createElement(
           SortableList,
           {
@@ -202,7 +215,7 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
             shouldCancelStart: this.cancelStartHandler,
             helperClass: 'sortable-item--dragging'
           },
-          _react2.default.createElement(UploadField, this.props)
+          _react2.default.createElement(UploadField, newProps)
         );
       }
     }]);
@@ -210,7 +223,7 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
     return SortableUploadField;
   }(_react.Component);
 
-  return (0, _reactRedux.connect)(null, mapDispatchToProps)(SortableUploadField);
+  return (0, _reactRedux.connect)(null, mapDispatchToProps)((0, _Injector.inject)(['UploadFieldItem'])(SortableUploadField));
 };
 
 exports.default = enhancedUploadField;

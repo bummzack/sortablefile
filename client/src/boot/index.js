@@ -10,10 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'enhance-uploadfield',
     (updater) => {
       updater.component('UploadField', SortableUploadField, 'SortableUploadField');
-      //TODO: Only replace the UploadFieldItem if the UploadField is marked as sortable…
-      updater.component('UploadFieldItem', SortableUploadFieldItem, 'SortableUploadFieldItem');
       updater.reducer('assetAdmin', sortableUploadFieldReducerTransformer);
     }
   );
 });
-
