@@ -1,9 +1,16 @@
 import React, {Component} from 'react';
-import {SortableElement} from 'react-sortable-hoc';
+import {SortableElement, SortableHandle} from 'react-sortable-hoc';
 import {connect} from "react-redux";
 
+const DragHandle = SortableHandle(() =>
+  <span className="sortable-item__handle icon font-icon-drag-handle">::</span>
+);
+
 const SortableItem = SortableElement((props) =>
-  <div className="sortable-item">{props.children}</div>
+  <div className="sortable-item">
+    <DragHandle />
+    {props.children}
+  </div>
 );
 
 function mapStateToProps(state, ownprops) {

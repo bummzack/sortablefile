@@ -78,7 +78,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Injector = __webpack_require__(3);
+var _Injector = __webpack_require__(2);
 
 var _Injector2 = _interopRequireDefault(_Injector);
 
@@ -123,7 +123,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactRedux = __webpack_require__(2);
+var _reactRedux = __webpack_require__(3);
 
 var _redux = __webpack_require__(4);
 
@@ -137,7 +137,7 @@ var _SortableUploadFieldActions = __webpack_require__("./client/src/state/Sortab
 
 var actions = _interopRequireWildcard(_SortableUploadFieldActions);
 
-var _Injector = __webpack_require__(3);
+var _Injector = __webpack_require__(2);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -212,6 +212,7 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
             items: this.props.files,
             lockAxis: 'y',
             onSortEnd: this.onSortEnd,
+            useDragHandle: true,
             shouldCancelStart: this.cancelStartHandler,
             helperClass: 'sortable-item--dragging'
           },
@@ -248,7 +249,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactSortableHoc = __webpack_require__("./node_modules/react-sortable-hoc/dist/commonjs/index.js");
 
-var _reactRedux = __webpack_require__(2);
+var _reactRedux = __webpack_require__(3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -258,10 +259,19 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var DragHandle = (0, _reactSortableHoc.SortableHandle)(function () {
+  return _react2.default.createElement(
+    'span',
+    { className: 'sortable-item__handle icon font-icon-drag-handle' },
+    '::'
+  );
+});
+
 var SortableItem = (0, _reactSortableHoc.SortableElement)(function (props) {
   return _react2.default.createElement(
     'div',
     { className: 'sortable-item' },
+    _react2.default.createElement(DragHandle, null),
     props.children
   );
 });
@@ -7604,14 +7614,14 @@ module.exports = ReactDom;
 /***/ 2:
 /***/ (function(module, exports) {
 
-module.exports = ReactRedux;
+module.exports = Injector;
 
 /***/ }),
 
 /***/ 3:
 /***/ (function(module, exports) {
 
-module.exports = Injector;
+module.exports = ReactRedux;
 
 /***/ }),
 

@@ -58,6 +58,7 @@ const enhancedUploadField = (UploadField) => {
           items={this.props.files}
           lockAxis="y"
           onSortEnd={this.onSortEnd}
+          useDragHandle={true}
           shouldCancelStart={this.cancelStartHandler}
           helperClass="sortable-item--dragging"
         >
