@@ -8,7 +8,7 @@
     "node": "^6.x"
   },
   "scripts": {
-    "build": "yarn && yarn test && NODE_ENV=production webpack -p --bail --progress",
+    "build": "yarn && NODE_ENV=production webpack -p --bail --progress",
     "dev": "NODE_ENV=development webpack --progress",
     "watch": "yarn && NODE_ENV=development webpack --watch --progress",
     "css": "yarn && WEBPACK_CHILD=css webpack -p --bail --progress",

@@ -123,6 +123,10 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = __webpack_require__(1);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _reactRedux = __webpack_require__(3);
 
 var _redux = __webpack_require__(4);
@@ -151,7 +155,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var SortableList = (0, _reactSortableHoc.SortableContainer)(function (props) {
   return props.children;
-});
+}, { withRef: true });
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -170,13 +174,26 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
 
       var _this = _possibleConstructorReturn(this, (SortableUploadField.__proto__ || Object.getPrototypeOf(SortableUploadField)).call(this, props));
 
+      _this.container = null;
       _this.onSortEnd = _this.onSortEnd.bind(_this);
+      _this.getContainer = _this.getContainer.bind(_this);
       _this.DecoratedUploadFieldItem = (0, _SortableUploadFieldItem2.default)(props.UploadFieldItem);
       _this.cancelStartHandler = _this.cancelStartHandler.bind(_this);
       return _this;
     }
 
     _createClass(SortableUploadField, [{
+      key: 'getContainer',
+      value: function getContainer() {
+        if (this.container) {
+          return this.container;
+        }
+        var el = _reactDom2.default.findDOMNode(this);
+        while ((el = el.parentElement) && !el.classList.contains("panel--scrollable")) {}
+        this.container = el;
+        return el;
+      }
+    }, {
       key: 'onSortEnd',
       value: function onSortEnd(_ref) {
         var oldIndex = _ref.oldIndex,
@@ -213,6 +230,7 @@ var enhancedUploadField = function enhancedUploadField(UploadField) {
             lockAxis: 'y',
             onSortEnd: this.onSortEnd,
             useDragHandle: true,
+            getContainer: this.getContainer,
             shouldCancelStart: this.cancelStartHandler,
             helperClass: 'sortable-item--dragging'
           },

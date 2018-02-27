@@ -7,8 +7,6 @@ import enhancedUploadFieldItem from 'components/SortableUploadFieldItem';
 import * as actions from 'state/SortableUploadFieldActions';
 import { inject } from 'lib/Injector';
 
-
-//TODO: Is this really needed?
 const SortableList = SortableContainer((props) => {
   return props.children;
 }, {withRef: true});
