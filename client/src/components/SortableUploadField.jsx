@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {SortableContainer} from 'react-sortable-hoc';
@@ -10,7 +11,7 @@ import { inject } from 'lib/Injector';
 //TODO: Is this really needed?
 const SortableList = SortableContainer((props) => {
   return props.children;
-});
+}, {withRef: true});
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -24,10 +25,23 @@ const enhancedUploadField = (UploadField) => {
   class SortableUploadField extends Component {
     constructor(props) {
       super(props);
+      this.container = null;
       this.onSortEnd = this.onSortEnd.bind(this);
+      this.getContainer = this.getContainer.bind(this);
       this.DecoratedUploadFieldItem = enhancedUploadFieldItem(props.UploadFieldItem);
       this.cancelStartHandler = this.cancelStartHandler.bind(this);
     };
+
+    getContainer()
+    {
+      if (this.container) {
+        return this.container;
+      }
+      let el = ReactDOM.findDOMNode(this);
+      while ((el = el.parentElement) && !el.classList.contains("panel--scrollable"));
+      this.container = el;
+      return el;
+    }
 
     onSortEnd({oldIndex, newIndex}) {
       this.props.actions.uploadField.changeSort(this.props.id, oldIndex, newIndex);
@@ -59,6 +73,7 @@ const enhancedUploadField = (UploadField) => {
           lockAxis="y"
           onSortEnd={this.onSortEnd}
           useDragHandle={true}
+          getContainer={this.getContainer}
           shouldCancelStart={this.cancelStartHandler}
           helperClass="sortable-item--dragging"
         >
