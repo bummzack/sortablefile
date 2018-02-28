@@ -25,10 +25,19 @@ const enhancedUploadField = (UploadField) => {
       super(props);
       this.container = null;
       this.onSortEnd = this.onSortEnd.bind(this);
+      this.getItemProps = this.getItemProps.bind(this);
       this.getContainer = this.getContainer.bind(this);
       this.DecoratedUploadFieldItem = enhancedUploadFieldItem(props.UploadFieldItem);
       this.cancelStartHandler = this.cancelStartHandler.bind(this);
-    };
+    }
+
+    getItemProps(props, index)
+    {
+      return {
+        ...props,
+        index
+      };
+    }
 
     getContainer()
     {
@@ -43,7 +52,7 @@ const enhancedUploadField = (UploadField) => {
 
     onSortEnd({oldIndex, newIndex}) {
       this.props.actions.uploadField.changeSort(this.props.id, oldIndex, newIndex);
-    };
+    }
 
     cancelStartHandler(e){
       if (!this.props.sortable) {
@@ -56,14 +65,18 @@ const enhancedUploadField = (UploadField) => {
       if (disabledElements.indexOf(e.target.tagName.toLowerCase()) !== -1) {
         return true; // Return true to cancel sorting
       }
-    };
+    }
 
     render() {
       if (!this.props.sortable) {
         return <UploadField {...this.props} />
       }
 
-      const newProps = {...this.props, UploadFieldItem: this.DecoratedUploadFieldItem };
+      const newProps = {
+        ...this.props,
+        UploadFieldItem: this.DecoratedUploadFieldItem,
+        getItemProps: this.getItemProps
+      };
 
       return (
         <SortableList
@@ -77,13 +90,13 @@ const enhancedUploadField = (UploadField) => {
         >
           <UploadField {...newProps} />
         </SortableList>
-      );
+      )
     }
   }
 
   return connect(null, mapDispatchToProps)(
     inject(['UploadFieldItem'])(SortableUploadField)
-  );
+  )
 };
 
 export default enhancedUploadField;
