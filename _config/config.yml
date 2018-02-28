@@ -2,5 +2,7 @@
 Name: sortablefile
 ---
 SilverStripe\Admin\LeftAndMain:
-  extensions:
-    - Bummzack\SortableFile\Extensions\LeftAndMainExtension
+  extra_requirements_css:
+    - 'bummzack/sortablefile: client/dist/styles/main.css'
+  extra_requirements_javascript:
+    - 'bummzack/sortablefile: client/dist/js/main.js'
