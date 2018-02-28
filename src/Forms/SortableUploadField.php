@@ -3,6 +3,7 @@
 namespace Bummzack\SortableFile\Forms;
 
 use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
@@ -62,9 +63,27 @@ class SortableUploadField extends UploadField
     public function getItems()
     {
         $items = parent::getItems();
+
+        // An ArrayList won't contain our sort-column, thus it has to be sorted by the raw submittal data.
+        // This is an issue that's seemingly exclusive to saving SiteConfig.
+        if (($items instanceof ArrayList) && !empty($this->rawSubmittal)) {
+            // flip the array, so that we can look up index by ID
+            $sortLookup = array_flip($this->rawSubmittal);
+            $itemsArray = $items->toArray();
+            usort($itemsArray, function ($itemA, $itemB) use($sortLookup) {
+                if (isset($sortLookup[$itemA->ID]) && isset($sortLookup[$itemB->ID])) {
+                    return $sortLookup[$itemA->ID] - $sortLookup[$itemB->ID];
+                }
+                return 0;
+            });
+
+            return ArrayList::create($itemsArray);
+        }
+
         if ($items instanceof Sortable) {
             return $items->sort([$this->getSortColumn() => 'ASC', 'ID' => 'ASC']);
         }
+
         return $items;
     }
 
@@ -83,6 +102,7 @@ class SortableUploadField extends UploadField
         if ($relation) {
             $idList = $this->getItemIDs();
             $rawList = $this->rawSubmittal;
+            $finalList = [];
 
             if ($relation instanceof ManyManyList) {
                 DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList) {
@@ -92,6 +112,7 @@ class SortableUploadField extends UploadField
                     foreach ($rawList as $id) {
                         if (in_array($id, $idList)) {
                             $relation->add($id, [ $this->getSortColumn() => $sort++ ]);
+                            $finalList[] = $id;
                         }
                     }
                 });
@@ -102,9 +123,11 @@ class SortableUploadField extends UploadField
                 foreach ($rawList as $id) {
                     if (in_array($id, $idList)) {
                         $relation->add($id, [ $this->getSortColumn() => $sort++ ]);
+                        $finalList[] = $id;
                     }
                 }
             }
+
         }
         return $this;
     }
