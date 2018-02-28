@@ -2,16 +2,17 @@
 
 namespace Bummzack\SortableFile\Forms;
 
+use Psr\Log\LoggerInterface;
 use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Assets\File;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\Queries\SQLUpdate;
-use SilverStripe\ORM\RelationList;
 use SilverStripe\ORM\Sortable;
+use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\UnsavedRelationList;
-
 
 /**
  * Extension of the UploadField to add sorting of files
@@ -21,12 +22,21 @@ use SilverStripe\ORM\UnsavedRelationList;
  */
 class SortableUploadField extends UploadField
 {
+    private static $dependencies = [
+        'logger' => '%$Psr\Log\LoggerInterface',
+    ];
+
     /**
      * @var string the column to be used for sorting
      */
     protected $sortColumn = 'SortOrder';
 
     protected $rawSubmittal = null;
+
+    /**
+     * @var LoggerInterface
+     */
+    public $logger;
 
     public function getSchemaDataDefaults()
     {
@@ -60,6 +70,10 @@ class SortableUploadField extends UploadField
         return $this->sortColumn;
     }
 
+    /**
+     * Return the files in sorted order
+     * @return File[]|SS_List
+     */
     public function getItems()
     {
         $items = parent::getItems();
@@ -70,7 +84,7 @@ class SortableUploadField extends UploadField
             // flip the array, so that we can look up index by ID
             $sortLookup = array_flip($this->rawSubmittal);
             $itemsArray = $items->toArray();
-            usort($itemsArray, function ($itemA, $itemB) use($sortLookup) {
+            usort($itemsArray, function ($itemA, $itemB) use ($sortLookup) {
                 if (isset($sortLookup[$itemA->ID]) && isset($sortLookup[$itemB->ID])) {
                     return $sortLookup[$itemA->ID] - $sortLookup[$itemB->ID];
                 }
@@ -102,33 +116,47 @@ class SortableUploadField extends UploadField
         if ($relation) {
             $idList = $this->getItemIDs();
             $rawList = $this->rawSubmittal;
-            $finalList = [];
+            $sortColumn = $this->getSortColumn();
 
             if ($relation instanceof ManyManyList) {
-                DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList) {
-                    // TODO: Optimize by using SQL update in one batch. Only works for the existing relation though!
-                    $sort = 0;
-                    $relation->removeAll();
-                    foreach ($rawList as $id) {
-                        if (in_array($id, $idList)) {
-                            $relation->add($id, [ $this->getSortColumn() => $sort++ ]);
-                            $finalList[] = $id;
-                        }
-                    }
-                });
-            } elseif ($relation instanceof UnsavedRelationList) {
-                $sort = 0;
+                try {
+                    DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList, $record, $sortColumn) {
+                        $relation->getForeignID();
+                        $ownerIdField = $relation->getForeignKey();
+                        $fileIdField = $relation->getLocalKey();
+                        $joinTable = '"'. $relation->getJoinTable() .'"';
 
+                        $sort = 0;
+                        foreach ($rawList as $id) {
+                            if (in_array($id, $idList)) {
+                                // Use SQLUpdate to update the data in the join-table.
+                                // This is safe to do, since new records have already been written to the DB in the
+                                // parent::saveInto call.
+                                SQLUpdate::create($joinTable)
+                                    ->setWhere([
+                                        "\"$ownerIdField\" = ?" => $record->ID,
+                                        "\"$fileIdField\" = ?" => $id
+                                    ])
+                                    ->assign($sortColumn, $sort++)
+                                    ->execute();
+                            }
+                        }
+                    });
+                } catch (\Exception $ex) {
+                    $this->logger->warning('Unable to sort files in sortable relation.', ['exception' => $ex]);
+                }
+            } elseif ($relation instanceof UnsavedRelationList) {
+                // With an unsaved relation list the items can just be removed and re-added
+                $sort = 0;
                 $relation->removeAll();
                 foreach ($rawList as $id) {
                     if (in_array($id, $idList)) {
-                        $relation->add($id, [ $this->getSortColumn() => $sort++ ]);
-                        $finalList[] = $id;
+                        $relation->add($id, [$sortColumn => $sort++]);
                     }
                 }
             }
-
         }
+
         return $this;
     }
 
