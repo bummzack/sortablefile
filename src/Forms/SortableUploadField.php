@@ -27,10 +27,15 @@ class SortableUploadField extends UploadField
     ];
 
     /**
-     * @var string the column to be used for sorting
+     * The column to be used for sorting
+     * @var string
      */
     protected $sortColumn = 'SortOrder';
 
+    /**
+     * Raw submitted form data
+     * @var null|array
+     */
     protected $rawSubmittal = null;
 
     /**
@@ -41,13 +46,9 @@ class SortableUploadField extends UploadField
     public function getSchemaDataDefaults()
     {
         $defaults = parent::getSchemaDataDefaults();
+        // Add a sortable prop for the react component
         $defaults['sortable'] = true;
         return $defaults;
-    }
-
-    public function Field($properties = [])
-    {
-        return parent::Field($properties);
     }
 
     /**
