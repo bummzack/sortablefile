@@ -156,5 +156,4 @@ class SortableUploadFieldTest extends SapphireTest
         $this->assertEquals(['FileA', 'FileB', 'FileC'], $obj->Files()->sort('SortOrder')->column('Title'));
         $this->assertEquals(['FileA', 'FileB', 'FileC'], $field->getItems()->column('Title'));
     }
-
 }
