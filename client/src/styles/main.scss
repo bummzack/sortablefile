@@ -1,0 +1,70 @@
+.sortable-item {
+  $base: &;
+  $radius: .192rem;
+  border: 1px solid #ced5e1;
+  border-radius: 0;
+  overflow: hidden;
+  position: relative;
+
+  &__handle {
+    position: absolute;
+    font-size: 20px;
+    z-index: 1;
+    cursor: move; /* Fallback for IE */
+    cursor: grab;
+    width: 24px;
+    height: 100%;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:before {
+      text-indent: 0;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      position: absolute;
+      line-height: 60px;
+    }
+  }
+
+  .uploadfield__dropzone + &, &:first-of-type {
+    border-top-left-radius: $radius;
+    border-top-right-radius: $radius;
+  }
+
+  &:last-of-type {
+    border-bottom-left-radius: $radius;
+    border-bottom-right-radius: $radius;
+  }
+
+  &--dragging {
+    border-radius: $radius;
+    cursor: move;  /* Fallback for IE */
+    cursor: grabbing;
+    pointer-events: auto !important;
+    #{$base}__handle {
+      cursor: grabbing;
+    }
+  }
+
+  // Reset the wrapped-component
+  .uploadfield-item {
+    padding-left: 24px;
+    &, &:first-child, &:last-child {
+      border: 0;
+      height: 60px;
+      border-radius: 0;
+    }
+    &__thumbnail {
+      border-radius: 0;
+    }
+  }
+
+  & + & {
+    // Collapse borders
+    margin-top: -1px;
+  }
+}
