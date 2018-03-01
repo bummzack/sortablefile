@@ -36,9 +36,9 @@ Bummzack\SortableFile\Tests\Model\TestDataObject:
       - =>SilverStripe\Assets\File.fileD:
           SortOrder: 4
     OtherFiles:
-      - =>SilverStripe\Assets\File.fileC:
-          SortOrder: 0
-      - =>SilverStripe\Assets\File.fileB:
-          SortOrder: 1
       - =>SilverStripe\Assets\File.fileA:
-          SortOrder: 2
+          Sort: 2
+      - =>SilverStripe\Assets\File.fileB:
+          Sort: 1
+      - =>SilverStripe\Assets\File.fileC:
+          Sort: 0
