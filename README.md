@@ -1,17 +1,38 @@
-sortablefile
+Sortable UploadField
 ============
 
-An extension for SilverStripe 4.1+ that allows sorting of multiple attached images.
+An extension for SilverStripe 4.1+ that allows sorting of files attached via `UploadField`.
 
-This is meant to be used with a `many_many` relation.
+This module decorates the existing `UploadField` and adds sorting capabilities to it.
+This is meant to be used with a `many_many` relation of Files or Images.
+
+![screen-capture](docs/assets/sorting.gif)
 
 Installation
 ------------
+
+This module only works with SilverStripe 4.1+.
+
+**Attention:** This module requires some functionality that hasn't been released yet. 
+That's why this module requires the `1.1` development branch of the  `silverstripe/asset-admin` module.
+
 The easiest way is to use [composer](https://getcomposer.org/):
 
     composer require bummzack/sortablefile ^2@dev
     
 Run `dev/build` afterwards.
+
+Usage
+-------------
+
+Usage is pretty simple. Just use `SortableUploadField` instead of `UploadField` to manage your `many_many` relations.
+To persist the sort-order, an additional extra-field with the sort-order has to be added to the `many_many` relation.
+You can do so by specifying the sort column via `many_many_extraFields` (see example below).
+
+By default the `SortableUploadField` assumes that the sort-column is named `SortOrder`. If you want to use another 
+field-name (for example `Sort`), you have to explicitly set it:
+
+    SortableUploadField::create('Files')->setSortColumn('Sort');
 
 Example setup for many_many
 -------------
@@ -21,7 +42,6 @@ Let's assume we have a `PortfolioPage` that has multiple `Images` attached.
 The `PortfolioPage` looks like this:
 
 ```php
-
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\FieldList;
 
@@ -41,9 +61,12 @@ class PortfolioPage extends Page
 
     public function getCMSFields()
     {
-        $this->beforeUpdateCMSFields(function (FieldList $fields){
-            $fields->addFieldToTab('Root.Main', SortableUploadField::create('Images'));
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->addFieldToTab('Root.Main', SortableUploadField::create(
+                'Images', $this->fieldLabel('Images')
+            ));
         });
+        
         return parent::getCMSFields();
     }
 }
@@ -59,7 +82,8 @@ Sorting the Files via a relation table isn't easily achievable via a DataExtensi
 
 ```php
 // Use this in your templates to get the correctly sorted images
-public function SortedImages(){
+public function SortedImages()
+{
     return $this->Images()->Sort('SortOrder');
 }
 ```
@@ -67,23 +91,15 @@ public function SortedImages(){
 And then in your templates use: 
 
 ```html+smarty
-<% loop SortedImages %>
-$SetWidth(500)
+<% loop $SortedImages %>
+  $ScaleWidth(500)
 <% end_loop %>
 ```
 
 Alternatively, you could simply use the sort statement in your template, which will remove the need for a special getter method in your page class.
 
 ```html+smarty
-<% loop Images.Sort('SortOrder') %>
-$SetWidth(500)
-<% end_loop %>
-```
-
-The above is only true for `many_many` relations. All `has_many` relations will be sorted automatically and you can just use:
-
-```html+smarty
-<% loop Images %>
-$SetWidth(500)
+<% loop $Images.Sort('SortOrder') %>
+  $ScaleWidth(500)
 <% end_loop %>
 ```
