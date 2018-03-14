@@ -51,6 +51,7 @@ The `PortfolioPage` looks like this:
 ```php
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\FieldList;
+use Bummzack\SortableFile\Forms\SortableUploadField;
 
 class PortfolioPage extends Page
 {   
@@ -80,7 +81,7 @@ class PortfolioPage extends Page
 ```
 
 Once this has been set up like described above, then you should be able to add images in the CMS 
-and sort them by dragging them (use the thumbnail as handle).
+and sort them by dragging them (use the handle on the left).
 
 Templates
 -------------
