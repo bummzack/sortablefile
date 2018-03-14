@@ -23,12 +23,9 @@ This module only works with SilverStripe 4.1+.
 
 For a version compatible with SilverStripe 3, please use a `1.x` release.
 
-**Attention:** This module requires some functionality that hasn't been released yet. 
-That's why this module requires the `1.1` development branch of the  `silverstripe/asset-admin` module.
-
 The easiest way is to use [composer](https://getcomposer.org/):
 
-    composer require bummzack/sortablefile ^2@dev
+    composer require bummzack/sortablefile ^2.0
     
 Run `dev/build` afterwards.
 
@@ -113,3 +110,10 @@ Alternatively, you could simply use the sort statement in your template, which w
   $ScaleWidth(500)
 <% end_loop %>
 ```
+
+What happened to `has_many` support?
+-------------
+
+Support for `has_many` relations has been dropped, since it can lead to a very bad user experience if a file can only be added to a single page.
+Imagine a user added an image to `Page A`, then adds the same image via _Add from files_ to `Page B`. 
+The file would then be removed from `Page A`, without any warning or explanation, which is bad UX.
