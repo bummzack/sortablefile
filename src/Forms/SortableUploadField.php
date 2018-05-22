@@ -8,6 +8,7 @@ use SilverStripe\Assets\File;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
+use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\Queries\SQLUpdate;
 use SilverStripe\ORM\Sortable;
@@ -146,6 +147,15 @@ class SortableUploadField extends UploadField
                 } catch (\Exception $ex) {
                     $this->logger->warning('Unable to sort files in sortable relation.', ['exception' => $ex]);
                 }
+            } elseif ($relation instanceof HasManyList) {
+                $sort = 0;
+                foreach ($rawList as $id) {
+                    if (in_array($id, $idList) && ($item = File::get()->byID($id))) {
+                        $item->$sortColumn = $sort++;
+                        $item->write();
+                    }
+                }
+
             } elseif ($relation instanceof UnsavedRelationList) {
                 // With an unsaved relation list the items can just be removed and re-added
                 $sort = 0;
