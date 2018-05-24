@@ -112,6 +112,18 @@ Alternatively, you could simply use the sort statement in your template, which w
 <% end_loop %>
 ```
 
+Many Many Through List
+-------------
+
+The module supports editing many many through lists as well. However to get it to completely work you'd need to add a new getter function on to the owner data object class.
+```php
+// Use this in your templates to get the correctly sorted images
+public function getImages()
+{
+    return $this->Images()->Sort('SortOrder');
+}
+```
+
 What happened to `has_many` support?
 -------------
 
