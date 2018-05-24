@@ -6,9 +6,12 @@ use Psr\Log\LoggerInterface;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\ManyManyThroughList;
+use SilverStripe\ORM\ManyManyThroughQueryManipulator;
 use SilverStripe\ORM\Queries\SQLUpdate;
 use SilverStripe\ORM\Sortable;
 use SilverStripe\ORM\SS_List;
@@ -125,8 +128,7 @@ class SortableUploadField extends UploadField
                         $relation->getForeignID();
                         $ownerIdField = $relation->getForeignKey();
                         $fileIdField = $relation->getLocalKey();
-                        $joinTable = '"'. $relation->getJoinTable() .'"';
-
+                        $joinTable = '"' . $relation->getJoinTable() . '"';
                         $sort = 0;
                         foreach ($rawList as $id) {
                             if (in_array($id, $idList)) {
@@ -145,6 +147,33 @@ class SortableUploadField extends UploadField
                     });
                 } catch (\Exception $ex) {
                     $this->logger->warning('Unable to sort files in sortable relation.', ['exception' => $ex]);
+                }
+            } elseif ($relation instanceof ManyManyThroughList) {
+                $relation->getForeignID();
+                $dataQuery = $relation->dataQuery();
+                $manipulators = $dataQuery->getDataQueryManipulators();
+                $manyManyManipulator = null;
+                foreach ($manipulators as $manipulator) {
+                    if($manipulator instanceof ManyManyThroughQueryManipulator) {
+                        $manyManyManipulator = $manipulator;
+                    }
+                }
+                $joinClass = $manyManyManipulator->getJoinClass();
+                $ownerIDField = $manyManyManipulator->getForeignKey();
+                $fileIdField = $manyManyManipulator->getLocalKey();
+
+                $sort = 0;
+                foreach ($rawList as $id) {
+                    if (in_array($id, $idList)) {
+                        $fileRecord = DataList::create($joinClass)->filter([
+                            $ownerIDField       => $relation->getForeignID(),
+                            $fileIdField        => $id
+                        ])->first();
+                        if($fileRecord) {
+                            $fileRecord->setField($sortColumn, $sort++);
+                            $fileRecord->write();
+                        }
+                    }
                 }
             } elseif ($relation instanceof UnsavedRelationList) {
                 // With an unsaved relation list the items can just be removed and re-added
