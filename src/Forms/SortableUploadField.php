@@ -154,7 +154,7 @@ class SortableUploadField extends UploadField
                 $manipulators = $dataQuery->getDataQueryManipulators();
                 $manyManyManipulator = null;
                 foreach ($manipulators as $manipulator) {
-                    if($manipulator instanceof ManyManyThroughQueryManipulator) {
+                    if ($manipulator instanceof ManyManyThroughQueryManipulator) {
                         $manyManyManipulator = $manipulator;
                     }
                 }
@@ -169,7 +169,7 @@ class SortableUploadField extends UploadField
                             $ownerIDField       => $relation->getForeignID(),
                             $fileIdField        => $id
                         ])->first();
-                        if($fileRecord) {
+                        if ($fileRecord) {
                             $fileRecord->setField($sortColumn, $sort++);
                             $fileRecord->write();
                         }
