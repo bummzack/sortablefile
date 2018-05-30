@@ -190,11 +190,10 @@ class SortableUploadFieldTest extends SapphireTest
         $this->assertEquals(4, $linkObjs->count());
 
         $titles = [];
-        foreach ($linkObjs as $linkObj)
+        foreach ($linkObjs as $linkObj) {
             $titles[] = $linkObj->File()->Title;
+        }
 
         $this->assertEquals(['FileD', 'FileB', 'FileA', 'FileC'], $titles);
-
     }
-
 }

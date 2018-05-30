@@ -19,9 +19,9 @@ class TestDataObject extends DataObject implements TestOnly
         'Files' => File::class,
         'OtherFiles' => File::class,
         'LinkedFiles' => [
-            'through' 			=> FileLinkDataObject::class,
-            'from' 				=> 'Owner',
-            'to' 				=> 'File',
+            'through' => FileLinkDataObject::class,
+            'from' => 'Owner',
+            'to' => 'File',
         ]
     ];
 
