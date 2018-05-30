@@ -3,6 +3,7 @@
 namespace Bummzack\SortableFile\Tests;
 
 use Bummzack\SortableFile\Forms\SortableUploadField;
+use Bummzack\SortableFile\Tests\Model\FileLinkDataObject;
 use Bummzack\SortableFile\Tests\Model\TestDataObject;
 use SilverStripe\Assets\Dev\TestAssetStore;
 use SilverStripe\Assets\File;
@@ -156,4 +157,44 @@ class SortableUploadFieldTest extends SapphireTest
         $this->assertEquals(['FileA', 'FileB', 'FileC'], $obj->Files()->sort('SortOrder')->column('Title'));
         $this->assertEquals(['FileA', 'FileB', 'FileC'], $field->getItems()->column('Title'));
     }
+
+    public function testExistingSortOrderForManyManyThroughList()
+    {
+        $obj = $this->objFromFixture(TestDataObject::class, 'obj2');
+
+        $field = SortableUploadField::create('LinkedFiles', 'LinkedFiles', $obj->LinkedFiles())->setRecord($obj);
+        $this->assertEquals(['FileA', 'FileB', 'FileC', 'FileD'], $field->getItems()->column('Title'));
+
+        // set field items in other order
+        $field->setValue($obj->LinkedFiles()->sort('FileHash'));
+        // Items should be returned in the correct order though.
+        $this->assertEquals(['FileA', 'FileB', 'FileC', 'FileD'], $field->getItems()->column('Title'));
+    }
+
+    public function testAddingFilesToNewRecordManyManyThroughList()
+    {
+        $obj = TestDataObject::create();
+
+        // The file IDs to add, Should result in D,B,A,C
+        $data = ['Files' => ['4','2','1','3']];
+
+        $field = SortableUploadField::create('LinkedFiles', 'LinkedFiles', $obj->getLinkedFiles())->setRecord($obj);
+        $field->setSubmittedValue($data);
+        $field->saveInto($obj);
+        $obj->write();
+
+        $this->assertEquals(['FileD', 'FileB', 'FileA', 'FileC'], $obj->LinkedFiles()->sort('SortOrder')->column('Title'));
+        $this->assertEquals(['FileD', 'FileB', 'FileA', 'FileC'], $field->getItems()->column('Title'));
+
+        $linkObjs = FileLinkDataObject::get()->filter('OwnerID', $obj->ID);
+        $this->assertEquals(4, $linkObjs->count());
+
+        $titles = [];
+        foreach ($linkObjs as $linkObj)
+            $titles[] = $linkObj->File()->Title;
+
+        $this->assertEquals(['FileD', 'FileB', 'FileA', 'FileC'], $titles);
+
+    }
+
 }

@@ -64,5 +64,5 @@ Bummzack\SortableFile\Tests\Model\FileLinkDataObject:
     Owner: =>Bummzack\SortableFile\Tests\Model\TestDataObject.obj2
   link4:
     SortOrder: 1
-    File: =>SilverStripe\Assets\File.fileAD
+    File: =>SilverStripe\Assets\File.fileD
     Owner: =>Bummzack\SortableFile\Tests\Model\TestDataObject.obj2
