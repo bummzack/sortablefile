@@ -24,6 +24,8 @@ SilverStripe\Assets\File:
     Name: FileD.txt
     Title: FileD
 
+
+
 Bummzack\SortableFile\Tests\Model\TestDataObject:
   obj1:
     Files:
@@ -42,3 +44,25 @@ Bummzack\SortableFile\Tests\Model\TestDataObject:
           Sort: 1
       - =>SilverStripe\Assets\File.fileC:
           Sort: 0
+  obj2:
+    Files:
+      - =>SilverStripe\Assets\File.fileA:
+          SortOrder: 0
+
+Bummzack\SortableFile\Tests\Model\FileLinkDataObject:
+  link1:
+    SortOrder: 0
+    File: =>SilverStripe\Assets\File.fileA
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestDataObject.obj2
+  link2:
+    SortOrder: 1
+    File: =>SilverStripe\Assets\File.fileB
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestDataObject.obj2
+  link3:
+    SortOrder: 1
+    File: =>SilverStripe\Assets\File.fileC
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestDataObject.obj2
+  link4:
+    SortOrder: 1
+    File: =>SilverStripe\Assets\File.fileAD
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestDataObject.obj2
