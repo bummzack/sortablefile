@@ -20,6 +20,8 @@ class TestManyManyDataObject extends DataObject implements TestOnly
         'OtherFiles' => [ 'Sort' => 'Int' ]
     ];
 
+    private static $table_name = 'Bummzack_TestManyManyDataObject';
+
     public function getCMSFields()
     {
         return FieldList::create(
@@ -27,4 +29,5 @@ class TestManyManyDataObject extends DataObject implements TestOnly
             SortableUploadField::create('OtherFiles')->setSortColumn('Sort')
         );
     }
+
 }

@@ -17,9 +17,10 @@ class TestFileLinkDataObject extends DataObject
         'Owner' => TestManyManyThroughDataObject::class
     ];
 
-    private static $default_sort = 'SortOrder';
-
     private static $extensions = [
         Versioned::class
     ];
+
+    private static $default_sort = 'SortOrder';
+    private static $table_name = 'Bummzack_TestFileLinkDataObject';
 }

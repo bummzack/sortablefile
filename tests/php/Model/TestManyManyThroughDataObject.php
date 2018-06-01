@@ -30,6 +30,8 @@ class TestManyManyThroughDataObject extends DataObject implements TestOnly
         Versioned::class
     ];
 
+    private static $table_name = 'Bummzack_TestManyManyThroughDataObject';
+
     public function getCMSFields()
     {
         return FieldList::create(
