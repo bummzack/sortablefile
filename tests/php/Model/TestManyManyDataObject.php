@@ -29,5 +29,4 @@ class TestManyManyDataObject extends DataObject implements TestOnly
             SortableUploadField::create('OtherFiles')->setSortColumn('Sort')
         );
     }
-
 }

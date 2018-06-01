@@ -175,7 +175,11 @@ class SortableUploadField extends UploadField
      * @param $sortColumn
      */
     protected function sortManyManyRelation(
-        ManyManyList $relation, array $idList, array $rawList, DataObjectInterface $record, $sortColumn
+        ManyManyList $relation,
+        array $idList,
+        array $rawList,
+        DataObjectInterface $record,
+        $sortColumn
     ) {
         $relation->getForeignID();
         $ownerIdField = $relation->getForeignKey();
@@ -207,7 +211,10 @@ class SortableUploadField extends UploadField
      * @throws \SilverStripe\ORM\ValidationException
      */
     protected function sortManyManyThroughRelation(
-        ManyManyThroughList $relation, array $idList, array $rawList, $sortColumn
+        ManyManyThroughList $relation,
+        array $idList,
+        array $rawList,
+        $sortColumn
     ) {
         $relation->getForeignID();
         $dataQuery = $relation->dataQuery();
