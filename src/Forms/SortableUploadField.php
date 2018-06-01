@@ -223,8 +223,14 @@ class SortableUploadField extends UploadField
         foreach ($manipulators as $manipulator) {
             if ($manipulator instanceof ManyManyThroughQueryManipulator) {
                 $manyManyManipulator = $manipulator;
+                break;
             }
         }
+
+        if (!$manyManyManipulator) {
+            throw new \LogicException('No ManyManyThroughQueryManipulator found');
+        }
+
         $joinClass = $manyManyManipulator->getJoinClass();
         $ownerIDField = $manyManyManipulator->getForeignKey();
         $fileIdField = $manyManyManipulator->getLocalKey();

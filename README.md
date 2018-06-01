@@ -134,18 +134,18 @@ class PortfolioPage extends Page
     private static $many_many = [
         'Images' => [
             'through' => PortfolioImage::class,
-            'from' => 'PortfolioPage', 
+            'from' => 'PortfolioPage',
             'to' => 'Image',
         ]
     ];
 
-	// This is required to automatically publish your images 
-	// whenever you publish your page
+    // This is required to automatically publish your images
+    // whenever you publish your page
     private static $owns = [
         'Images'
     ];
-    
-    // This is required to publish deletions as well, 
+
+    // This is required to publish deletions as well,
     // as this will not happen by default!
     private static $cascade_deletes = [
         'Images'
@@ -161,7 +161,7 @@ class PortfolioPage extends Page
 
         return parent::getCMSFields();
     }
-    
+
     // This is a helper method, that is needed to display the items in the
     // correct order. Is required for proper CMS functionality and can be
     // used in templates as $getImages
