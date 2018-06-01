@@ -23,22 +23,3 @@ SilverStripe\Assets\File:
     FileHash: 39e0574a4abfd646565a3e436c548eeb1684fb57
     Name: FileD.txt
     Title: FileD
-
-Bummzack\SortableFile\Tests\Model\TestDataObject:
-  obj1:
-    Files:
-      - =>SilverStripe\Assets\File.fileA:
-          SortOrder: 0
-      - =>SilverStripe\Assets\File.fileB:
-          SortOrder: 1
-      - =>SilverStripe\Assets\File.fileC:
-          SortOrder: 2
-      - =>SilverStripe\Assets\File.fileD:
-          SortOrder: 4
-    OtherFiles:
-      - =>SilverStripe\Assets\File.fileA:
-          Sort: 2
-      - =>SilverStripe\Assets\File.fileB:
-          Sort: 1
-      - =>SilverStripe\Assets\File.fileC:
-          Sort: 0

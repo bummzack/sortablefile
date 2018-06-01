@@ -1,0 +1,48 @@
+SilverStripe\Assets\File:
+  fileA:
+    ID: 1
+    FileFilename: FileA.txt
+    FileHash: 7d157d7c000ae27db146575c08ce30df893d3a64
+    Name: FileA.txt
+    Title: FileA
+  fileB:
+    ID: 2
+    FileFilename: FileB.txt
+    FileHash: 31836aeaab22dc49555a97edb4c753881432e01d
+    Name: FileB.txt
+    Title: FileB
+  fileC:
+    ID: 3
+    FileFilename: FileC.txt
+    FileHash: 6fa8c57336628a7d733f684dc9404fbd09020543
+    Name: FileC.txt
+    Title: FileC
+  fileD:
+    ID: 4
+    FileFilename: FileD.txt
+    FileHash: 39e0574a4abfd646565a3e436c548eeb1684fb57
+    Name: FileD.txt
+    Title: FileD
+
+Bummzack\SortableFile\Tests\Model\TestManyManyThroughDataObject:
+  obj1:
+    ID: 1
+
+Bummzack\SortableFile\Tests\Model\TestFileLinkDataObject:
+  # Relations to obj1
+  link1:
+    SortOrder: 0
+    File: =>SilverStripe\Assets\File.fileA
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestManyManyThroughDataObject.obj1
+  link2:
+    SortOrder: 1
+    File: =>SilverStripe\Assets\File.fileB
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestManyManyThroughDataObject.obj1
+  link3:
+    SortOrder: 2
+    File: =>SilverStripe\Assets\File.fileC
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestManyManyThroughDataObject.obj1
+  link4:
+    SortOrder: 3
+    File: =>SilverStripe\Assets\File.fileD
+    Owner: =>Bummzack\SortableFile\Tests\Model\TestManyManyThroughDataObject.obj1

@@ -8,7 +8,7 @@ use SilverStripe\Dev\TestOnly;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 
-class TestDataObject extends DataObject implements TestOnly
+class TestManyManyDataObject extends DataObject implements TestOnly
 {
     private static $many_many = [
         'Files' => File::class,
@@ -19,6 +19,8 @@ class TestDataObject extends DataObject implements TestOnly
         'Files' => [ 'SortOrder' => 'Int' ],
         'OtherFiles' => [ 'Sort' => 'Int' ]
     ];
+
+    private static $table_name = 'Bummzack_TestManyManyDataObject';
 
     public function getCMSFields()
     {

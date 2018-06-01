@@ -6,9 +6,12 @@ use Psr\Log\LoggerInterface;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\ManyManyThroughList;
+use SilverStripe\ORM\ManyManyThroughQueryManipulator;
 use SilverStripe\ORM\Queries\SQLUpdate;
 use SilverStripe\ORM\Sortable;
 use SilverStripe\ORM\SS_List;
@@ -121,27 +124,20 @@ class SortableUploadField extends UploadField
 
             if ($relation instanceof ManyManyList) {
                 try {
+                    // Apply the sorting, wrapped in a transaction.
+                    // If something goes wrong, the DB will not contain invalid data
                     DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList, $record, $sortColumn) {
-                        $relation->getForeignID();
-                        $ownerIdField = $relation->getForeignKey();
-                        $fileIdField = $relation->getLocalKey();
-                        $joinTable = '"'. $relation->getJoinTable() .'"';
-
-                        $sort = 0;
-                        foreach ($rawList as $id) {
-                            if (in_array($id, $idList)) {
-                                // Use SQLUpdate to update the data in the join-table.
-                                // This is safe to do, since new records have already been written to the DB in the
-                                // parent::saveInto call.
-                                SQLUpdate::create($joinTable)
-                                    ->setWhere([
-                                        "\"$ownerIdField\" = ?" => $record->ID,
-                                        "\"$fileIdField\" = ?" => $id
-                                    ])
-                                    ->assign($sortColumn, $sort++)
-                                    ->execute();
-                            }
-                        }
+                        $this->sortManyManyRelation($relation, $idList, $rawList, $record, $sortColumn);
+                    });
+                } catch (\Exception $ex) {
+                    $this->logger->warning('Unable to sort files in sortable relation.', ['exception' => $ex]);
+                }
+            } elseif ($relation instanceof ManyManyThroughList) {
+                try {
+                    // Apply the sorting, wrapped in a transaction.
+                    // If something goes wrong, the DB will not contain invalid data
+                    DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList, $sortColumn) {
+                        $this->sortManyManyThroughRelation($relation, $idList, $rawList, $sortColumn);
                     });
                 } catch (\Exception $ex) {
                     $this->logger->warning('Unable to sort files in sortable relation.', ['exception' => $ex]);
@@ -168,5 +164,84 @@ class SortableUploadField extends UploadField
             $this->rawSubmittal = $value['Files'];
         }
         return $this->setValue($value, $data);
+    }
+
+    /**
+     * Apply sorting to a many_many relation
+     * @param ManyManyList $relation
+     * @param array $idList
+     * @param array $rawList
+     * @param DataObjectInterface $record
+     * @param $sortColumn
+     */
+    protected function sortManyManyRelation(
+        ManyManyList $relation,
+        array $idList,
+        array $rawList,
+        DataObjectInterface $record,
+        $sortColumn
+    ) {
+        $relation->getForeignID();
+        $ownerIdField = $relation->getForeignKey();
+        $fileIdField = $relation->getLocalKey();
+        $joinTable = '"' . $relation->getJoinTable() . '"';
+        $sort = 0;
+        foreach ($rawList as $id) {
+            if (in_array($id, $idList)) {
+                // Use SQLUpdate to update the data in the join-table.
+                // This is safe to do, since new records have already been written to the DB in the
+                // parent::saveInto call.
+                SQLUpdate::create($joinTable)
+                    ->setWhere([
+                        "\"$ownerIdField\" = ?" => $record->ID,
+                        "\"$fileIdField\" = ?" => $id
+                    ])
+                    ->assign($sortColumn, $sort++)
+                    ->execute();
+            }
+        }
+    }
+
+    /**
+     * Apply sorting to a many_many_through relation
+     * @param ManyManyThroughList $relation
+     * @param array $idList
+     * @param array $rawList
+     * @param $sortColumn
+     * @throws \SilverStripe\ORM\ValidationException
+     */
+    protected function sortManyManyThroughRelation(
+        ManyManyThroughList $relation,
+        array $idList,
+        array $rawList,
+        $sortColumn
+    ) {
+        $relation->getForeignID();
+        $dataQuery = $relation->dataQuery();
+        $manipulators = $dataQuery->getDataQueryManipulators();
+        $manyManyManipulator = null;
+        foreach ($manipulators as $manipulator) {
+            if ($manipulator instanceof ManyManyThroughQueryManipulator) {
+                $manyManyManipulator = $manipulator;
+            }
+        }
+        $joinClass = $manyManyManipulator->getJoinClass();
+        $ownerIDField = $manyManyManipulator->getForeignKey();
+        $fileIdField = $manyManyManipulator->getLocalKey();
+
+        $sort = 0;
+        foreach ($rawList as $id) {
+            if (in_array($id, $idList)) {
+                $fileRecord = DataList::create($joinClass)->filter([
+                    $ownerIDField => $relation->getForeignID(),
+                    $fileIdField  => $id
+                ])->first();
+
+                if ($fileRecord) {
+                    $fileRecord->setField($sortColumn, $sort++);
+                    $fileRecord->write();
+                }
+            }
+        }
     }
 }
