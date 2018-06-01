@@ -136,8 +136,8 @@ class SortableUploadField extends UploadField
                 try {
                     // Apply the sorting, wrapped in a transaction.
                     // If something goes wrong, the DB will not contain invalid data
-                    DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList, $record, $sortColumn) {
-                        $this->sortManyManyThroughRelation($relation, $idList, $rawList, $record, $sortColumn);
+                    DB::get_conn()->withTransaction(function () use ($relation, $idList, $rawList, $sortColumn) {
+                        $this->sortManyManyThroughRelation($relation, $idList, $rawList, $sortColumn);
                     });
                 } catch (\Exception $ex) {
                     $this->logger->warning('Unable to sort files in sortable relation.', ['exception' => $ex]);
@@ -203,12 +203,11 @@ class SortableUploadField extends UploadField
      * @param ManyManyThroughList $relation
      * @param array $idList
      * @param array $rawList
-     * @param DataObjectInterface $record
      * @param $sortColumn
      * @throws \SilverStripe\ORM\ValidationException
      */
     protected function sortManyManyThroughRelation(
-        ManyManyThroughList $relation, array $idList, array $rawList, DataObjectInterface $record, $sortColumn
+        ManyManyThroughList $relation, array $idList, array $rawList, $sortColumn
     ) {
         $relation->getForeignID();
         $dataQuery = $relation->dataQuery();
@@ -227,9 +226,10 @@ class SortableUploadField extends UploadField
         foreach ($rawList as $id) {
             if (in_array($id, $idList)) {
                 $fileRecord = DataList::create($joinClass)->filter([
-                    $ownerIDField       => $relation->getForeignID(),
-                    $fileIdField        => $id
+                    $ownerIDField => $relation->getForeignID(),
+                    $fileIdField  => $id
                 ])->first();
+
                 if ($fileRecord) {
                     $fileRecord->setField($sortColumn, $sort++);
                     $fileRecord->write();
