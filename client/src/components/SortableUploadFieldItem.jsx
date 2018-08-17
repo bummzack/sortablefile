@@ -3,7 +3,7 @@ import {SortableElement, SortableHandle} from 'react-sortable-hoc';
 import {connect} from "react-redux";
 
 const DragHandle = SortableHandle(() =>
-  <span className="sortable-item__handle icon font-icon-drag-handle">::</span>
+  <span className="sortable-item__handle icon font-icon-drag-handle" />
 );
 
 const SortableItem = SortableElement((props) =>
