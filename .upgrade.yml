@@ -1,2 +1,2 @@
 mappings:
-  SortableUploadField: Bummzack\SortableFile\SortableUploadField
+  SortableUploadField: Bummzack\SortableFile\Forms\SortableUploadField
