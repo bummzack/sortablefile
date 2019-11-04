@@ -250,4 +250,12 @@ class SortableUploadField extends UploadField
             }
         }
     }
+    
+    public function setCanAttachExisting($arg = 0) {
+        return $this;
+    }
+
+    public function setOverwriteWarning($arg = 0) {
+        return $this;
+    }
 }
