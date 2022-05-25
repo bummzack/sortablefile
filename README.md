@@ -90,6 +90,13 @@ Sorting the Files via a relation table isn't easily achievable via a DataExtensi
 
 ```php
 // Use this in your templates to get the correctly sorted images
+
+public function Images()
+{
+    return $this->getManyManyComponents('Images')->sort('SortOrder');
+}
+
+// and/or
 public function SortedImages()
 {
     return $this->Images()->Sort('SortOrder');
