@@ -6,7 +6,9 @@
         "silverstripe",
         "CMS",
         "sortable",
-        "file"
+        "file",
+        "UploadField",
+        "Many Files"
     ],
     "license": "BSD-3-Clause",
     "authors": [
