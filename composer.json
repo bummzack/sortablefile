@@ -1,6 +1,6 @@
 {
     "name": "bummzack/sortablefile",
-    "description": "An extension for SilverStripe 5 that adds sorting to UploadField.",
+    "description": "An extension for SilverStripe that adds sorting to UploadField.",
     "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",
@@ -17,7 +17,8 @@
         }
     ],
     "require": {
-        "silverstripe/asset-admin": "^2"
+        "silverstripe/asset-admin": "^1.1 || ^2",
+        "silverstripe/framework": "^4.1 || ^5"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7"
