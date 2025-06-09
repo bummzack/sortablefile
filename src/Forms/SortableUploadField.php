@@ -5,7 +5,8 @@ namespace Bummzack\SortableFile\Forms;
 use Psr\Log\LoggerInterface;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\DB;
@@ -13,8 +14,6 @@ use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ManyManyThroughList;
 use SilverStripe\ORM\ManyManyThroughQueryManipulator;
 use SilverStripe\ORM\Queries\SQLUpdate;
-use SilverStripe\ORM\Sortable;
-use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\UnsavedRelationList;
 
 /**
@@ -98,7 +97,7 @@ class SortableUploadField extends UploadField
             return ArrayList::create($itemsArray);
         }
 
-        if ($items instanceof Sortable) {
+        if ($items instanceof SS_List) {
             return $items->sort([$this->getSortColumn() => 'ASC', 'ID' => 'ASC']);
         }
 
@@ -208,7 +207,7 @@ class SortableUploadField extends UploadField
      * @param array $idList
      * @param array $rawList
      * @param $sortColumn
-     * @throws \SilverStripe\ORM\ValidationException
+     * @throws \SilverStripe\Core\Validation\ValidationException
      */
     protected function sortManyManyThroughRelation(
         ManyManyThroughList $relation,
