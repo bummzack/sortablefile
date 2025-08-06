@@ -4,6 +4,9 @@ checks:
   php: true
 
 build:
+  image: default-bionic
+  environment:
+    php: 8.3.22
   nodes:
     analysis:
       tests:
